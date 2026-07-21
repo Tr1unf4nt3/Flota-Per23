@@ -13,12 +13,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
-    <!-- Firebase SDK (versión modular compat) -->
     <script type="importmap">
         {
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
-                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"
             }
         }
     </script>
@@ -46,6 +46,9 @@
         .form-grid { display: grid; gap: 1rem; }
         @media (min-width: 768px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .form-grid { grid-template-columns: repeat(3, 1fr); } }
+        /* Evitar duplicación de submits */
+        form button[type="submit"] { position: relative; }
+        form button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -111,7 +114,7 @@
                     <!-- VEHÍCULOS -->
                     <div id="vehiculos" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Registro de Vehículos</h2>
-                        <form id="vehicleForm" class="form-grid mb-6">
+                        <form id="vehicleForm" class="form-grid mb-6" autocomplete="off">
                             <input type="hidden" id="vehicleId">
                             <div><label for="placa" class="block text-sm font-medium text-gray-700">Placa</label><input type="text" id="placa" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-inter-primary p-2" required></div>
                             <div><label for="marca" class="block text-sm font-medium text-gray-700">Marca</label><input type="text" id="marca" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-inter-primary p-2" required></div>
@@ -146,7 +149,7 @@
                     <!-- MANTENIMIENTOS -->
                     <div id="mantenimientos" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Registro de Mantenimientos</h2>
-                        <form id="maintenanceForm" class="form-grid mb-6">
+                        <form id="maintenanceForm" class="form-grid mb-6" autocomplete="off">
                             <input type="hidden" id="maintenanceId">
                             <div><label for="placaMantenimiento" class="block text-sm font-medium text-gray-700">Placa</label><input list="placasList" id="placaMantenimiento" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-inter-primary p-2" required><datalist id="placasList"></datalist></div>
                             <div><label for="tipoMantenimiento" class="block text-sm font-medium text-gray-700">Tipo</label><select id="tipoMantenimiento" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-inter-primary p-2" required><option value="" disabled selected>Seleccione</option><option value="preventivo">Preventivo</option><option value="correctivo">Correctivo</option></select></div>
@@ -171,7 +174,7 @@
                     <div id="inspeccion" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Inspección Pre-Operacional</h2>
                         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6"><p class="text-blue-700 font-medium">⚠️ Complete todos los campos obligatorios (*)</p></div>
-                        <form id="inspectionForm" class="form-grid mb-6">
+                        <form id="inspectionForm" class="form-grid mb-6" autocomplete="off">
                             <input type="hidden" id="inspectionId">
                             <div><label for="placaInspeccion">Placa *</label><input list="placasList" id="placaInspeccion" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
                             <div><label for="conductorInspeccion">Conductor *</label><input type="text" id="conductorInspeccion" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
@@ -193,7 +196,7 @@
                     <!-- COMBUSTIBLE -->
                     <div id="combustible" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Control de Combustible</h2>
-                        <form id="fuelForm" class="form-grid mb-6">
+                        <form id="fuelForm" class="form-grid mb-6" autocomplete="off">
                             <input type="hidden" id="fuelId">
                             <div><label for="placaCombustible">Placa</label><input list="placasList" id="placaCombustible" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
                             <div><label for="kilometrajeRegistro">Kilometraje al momento de carga</label><input type="number" id="kilometrajeRegistro" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
@@ -228,7 +231,7 @@
                     <!-- SINIESTROS -->
                     <div id="siniestros" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Registro de Siniestros</h2>
-                        <form id="siniestroForm" class="form-grid mb-6">
+                        <form id="siniestroForm" class="form-grid mb-6" autocomplete="off">
                             <input type="hidden" id="siniestroId">
                             <div><label for="placaSiniestro">Placa</label><input list="placasList" id="placaSiniestro" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
                             <div><label for="fechaHoraSiniestro">Fecha y Hora</label><input type="datetime-local" id="fechaHoraSiniestro" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
@@ -251,7 +254,7 @@
                     <!-- LAVADO -->
                     <div id="lavado" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Lavado de autos</h2>
-                        <form id="lavadoForm" class="form-grid mb-6">
+                        <form id="lavadoForm" class="form-grid mb-6" autocomplete="off">
                             <input type="hidden" id="lavadoId">
                             <div><label for="placaLavado">Placa</label><input list="placasList" id="placaLavado" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
                             <div><label for="estadoPagoLavado">Estado Pago</label><select id="estadoPagoLavado" class="mt-1 block w-full rounded-md border-gray-300 p-2"><option value="pendiente">Pendiente</option><option value="pagado">Pagado</option></select></div>
@@ -271,7 +274,7 @@
                     <!-- GASOIL -->
                     <div id="gasoil-head-end" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Gasoil Head End</h2>
-                        <form id="gasoilForm" class="form-grid mb-6">
+                        <form id="gasoilForm" class="form-grid mb-6" autocomplete="off">
                             <input type="hidden" id="gasoilId">
                             <div><label for="placaGasoil">Placa</label><input list="placasList" id="placaGasoil" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
                             <div><label for="estadoPagoGasoil">Estado Pago</label><select id="estadoPagoGasoil" class="mt-1 block w-full rounded-md border-gray-300 p-2"><option value="pendiente">Pendiente</option><option value="pagado">Pagado</option></select></div>
@@ -341,7 +344,6 @@
             console.warn('⚠️ Error Firebase:', error);
         }
 
-        // Exponer db globalmente para uso en funciones no-module
         window.db = db;
         window.firebaseInicializado = firebaseInicializado;
 
@@ -360,6 +362,9 @@
         let siniestros = [];
         let lavados = [];
         let gasoilRecords = [];
+        
+        // Flag para controlar duplicación de submits
+        let isSubmitting = false;
 
         let monthlyComparisonChart = null;
         let expenseDistributionChart = null;
@@ -375,7 +380,7 @@
             camion_pesado: { min: 3, max: 4, promedio: 3.5 }
         };
 
-        const USERS = { admin: { password: 'Admingua28', role: 'admin', name: 'Administrador' }, chofer: { password: 'Inter1234', role: 'chofer', name: 'Chofer' } };
+        const USERS = { admin: { password: 'Adminltq23', role: 'admin', name: 'Administrador' }, chofer: { password: 'Inter1234', role: 'chofer', name: 'Chofer' } };
 
         // ============ FUNCIONES DE ANÁLISIS DE COMBUSTIBLE ============
         function calcularRendimiento(kmRecorridos, litros) {
@@ -638,7 +643,10 @@
             try { 
                 const docRef = await addDoc(collection(window.db, collectionName), { ...data, createdAt: serverTimestamp() }); 
                 return docRef.id; 
-            } catch(e) { console.error("Error saving to Firebase:", e); return null; } 
+            } catch(e) { 
+                console.error("Error saving to Firebase:", e); 
+                return null; 
+            } 
         }
         
         async function loadFromFirebase(collectionName) { 
@@ -648,7 +656,10 @@
                 const data = []; 
                 snapshot.forEach(doc => data.push({ firebaseId: doc.id, ...doc.data() })); 
                 return data; 
-            } catch(e) { console.error("Error loading from Firebase:", e); return []; } 
+            } catch(e) { 
+                console.error("Error loading from Firebase:", e); 
+                return []; 
+            } 
         }
         
         async function updateInFirebase(collectionName, docId, data) { 
@@ -656,7 +667,10 @@
             try { 
                 await updateDoc(doc(window.db, collectionName, docId), { ...data, updatedAt: serverTimestamp() }); 
                 return true; 
-            } catch(e) { console.error("Error updating in Firebase:", e); return false; } 
+            } catch(e) { 
+                console.error("Error updating in Firebase:", e); 
+                return false; 
+            } 
         }
         
         async function deleteFromFirebase(collectionName, docId) { 
@@ -664,7 +678,10 @@
             try { 
                 await deleteDoc(doc(window.db, collectionName, docId)); 
                 return true; 
-            } catch(e) { console.error("Error deleting from Firebase:", e); return false; } 
+            } catch(e) { 
+                console.error("Error deleting from Firebase:", e); 
+                return false; 
+            } 
         }
 
         async function syncAllWithFirebase() {
@@ -676,7 +693,6 @@
             try {
                 updateSyncStatus('loading', 'Sincronizando...');
                 
-                // Cargar datos desde Firebase
                 const fbVehicles = await loadFromFirebase('vehicles');
                 const fbMaintenances = await loadFromFirebase('maintenances');
                 const fbInspections = await loadFromFirebase('inspections');
@@ -685,7 +701,6 @@
                 const fbLavados = await loadFromFirebase('lavados');
                 const fbGasoil = await loadFromFirebase('gasoilRecords');
                 
-                // Actualizar arrays locales
                 if (fbVehicles.length) vehicles = fbVehicles;
                 if (fbMaintenances.length) maintenances = fbMaintenances;
                 if (fbInspections.length) inspections = fbInspections;
@@ -694,7 +709,6 @@
                 if (fbLavados.length) lavados = fbLavados;
                 if (fbGasoil.length) gasoilRecords = fbGasoil;
                 
-                // Guardar en localStorage
                 localStorage.setItem('vehicles', JSON.stringify(vehicles));
                 localStorage.setItem('maintenances', JSON.stringify(maintenances));
                 localStorage.setItem('inspections', JSON.stringify(inspections));
@@ -703,7 +717,6 @@
                 localStorage.setItem('lavados', JSON.stringify(lavados));
                 localStorage.setItem('gasoilRecords', JSON.stringify(gasoilRecords));
                 
-                // Recargar vistas
                 loadAllData();
                 updateReports();
                 updateTotalPendienteHeader();
@@ -764,8 +777,24 @@
             }
         }
 
-        // ============ FUNCIÓN DE GUARDADO GENÉRICA ============
-        async function guardarRegistro(coleccion, datos, id, arrayLocal, nombreSingular, callbackCarga) {
+        // ============ FUNCIÓN DE GUARDADO GENÉRICA CON PREVENCIÓN DE DUPLICACIÓN ============
+        async function guardarRegistro(coleccion, datos, id, arrayLocal, nombreSingular, callbackCarga, formElement) {
+            // Prevenir ejecución múltiple
+            if (isSubmitting) {
+                console.warn('⏳ Ya hay una operación en curso, ignorando...');
+                return false;
+            }
+            
+            isSubmitting = true;
+            
+            // Deshabilitar botón de submit
+            const submitBtn = formElement?.querySelector('button[type="submit"]');
+            const originalText = submitBtn?.textContent || 'Guardando...';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Guardando...';
+            }
+            
             try {
                 let fbId = null;
                 let registro = { ...datos };
@@ -813,6 +842,13 @@
                 console.error(`Error guardando ${nombreSingular}:`, error);
                 alert(`❌ Error al guardar ${nombreSingular}`);
                 return false;
+            } finally {
+                // Restaurar botón
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
+                isSubmitting = false;
             }
         }
 
@@ -831,9 +867,19 @@
         function setupVehicleForm() {
             const form = document.getElementById('vehicleForm');
             if(!form) return;
-            form.addEventListener('submit', async (e) => {
+            
+            // Remover listeners anteriores para evitar duplicación
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            newForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if(currentUser.role !== 'admin') { alert('Solo administrador'); return; }
+                e.stopPropagation();
+                
+                if(currentUser.role !== 'admin') { 
+                    alert('Solo administrador'); 
+                    return; 
+                }
                 
                 const id = document.getElementById('vehicleId').value;
                 const vehicle = {
@@ -849,15 +895,17 @@
                     estado: document.getElementById('estado').value || 'Operativo'
                 };
                 
-                await guardarRegistro('vehicles', vehicle, id, vehicles, 'vehículo', loadVehicleData);
-                form.reset();
-                document.getElementById('vehicleId').value = '';
-                updatePlacasList();
+                const success = await guardarRegistro('vehicles', vehicle, id, vehicles, 'vehículo', loadVehicleData, newForm);
+                if (success) {
+                    newForm.reset();
+                    document.getElementById('vehicleId').value = '';
+                    updatePlacasList();
+                }
             });
             
             document.getElementById('deleteMassiveBtn')?.addEventListener('click', async () => {
                 if(currentUser.role !== 'admin') return;
-                if(confirm('¿Eliminar TODOS los vehículos? Esto también los eliminará de Firebase.')) {
+                if(confirm('¿Eliminar TODOS los vehículos?')) {
                     for(let v of vehicles) {
                         if(v.firebaseId) await deleteFromFirebase('vehicles', v.firebaseId);
                     }
@@ -919,9 +967,18 @@
         function setupMaintenanceForm() {
             const form = document.getElementById('maintenanceForm');
             if(!form) return;
-            form.addEventListener('submit', async (e) => {
+            
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            newForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if(currentUser.role !== 'admin') { alert('Solo administrador'); return; }
+                e.stopPropagation();
+                
+                if(currentUser.role !== 'admin') { 
+                    alert('Solo administrador'); 
+                    return; 
+                }
                 
                 const id = document.getElementById('maintenanceId').value;
                 const tipo = document.getElementById('tipoMantenimiento').value;
@@ -938,9 +995,11 @@
                     causa: tipo === 'correctivo' ? document.getElementById('causaCorrectivo').value : ''
                 };
                 
-                await guardarRegistro('maintenances', maintenance, id, maintenances, 'mantenimiento', loadMaintenanceData);
-                form.reset();
-                document.getElementById('maintenanceId').value = '';
+                const success = await guardarRegistro('maintenances', maintenance, id, maintenances, 'mantenimiento', loadMaintenanceData, newForm);
+                if (success) {
+                    newForm.reset();
+                    document.getElementById('maintenanceId').value = '';
+                }
             });
             
             document.getElementById('tipoMantenimiento')?.addEventListener('change', function() {
@@ -1026,8 +1085,14 @@
         function setupInspectionForm() {
             const form = document.getElementById('inspectionForm');
             if(!form) return;
-            form.addEventListener('submit', async (e) => {
+            
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            newForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                e.stopPropagation();
+                
                 const btn = document.getElementById('guardarInspeccionBtn');
                 if(btn.disabled) return;
                 btn.disabled = true;
@@ -1047,11 +1112,13 @@
                         observaciones: document.getElementById('observacionesInspeccion').value
                     };
                     
-                    await guardarRegistro('inspections', inspection, id, inspections, 'inspección', loadInspectionData);
-                    form.reset();
-                    document.getElementById('inspectionId').value = '';
-                    document.getElementById('horaInspeccion').value = getHoraVenezuela();
-                    alert('✅ Inspección guardada');
+                    const success = await guardarRegistro('inspections', inspection, id, inspections, 'inspección', loadInspectionData, newForm);
+                    if (success) {
+                        newForm.reset();
+                        document.getElementById('inspectionId').value = '';
+                        document.getElementById('horaInspeccion').value = getHoraVenezuela();
+                        alert('✅ Inspección guardada');
+                    }
                 } catch(e) { 
                     alert('❌ Error al guardar la inspección'); 
                 }
@@ -1110,13 +1177,23 @@
         function setupFuelForm() {
             const form = document.getElementById('fuelForm');
             if(!form) return;
+            
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
             document.getElementById('litros')?.addEventListener('input', () => { 
                 const l = parseFloat(document.getElementById('litros').value)||0; 
                 document.getElementById('costoCombustible').value = (l*0.50).toFixed(2); 
             });
-            form.addEventListener('submit', async (e) => {
+            
+            newForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if(currentUser.role !== 'admin') { alert('Solo administrador'); return; }
+                e.stopPropagation();
+                
+                if(currentUser.role !== 'admin') { 
+                    alert('Solo administrador'); 
+                    return; 
+                }
                 
                 const id = document.getElementById('fuelId').value;
                 const litros = parseFloat(document.getElementById('litros').value)||0;
@@ -1141,9 +1218,11 @@
                     localStorage.setItem('vehicles', JSON.stringify(vehicles));
                 }
                 
-                await guardarRegistro('fuelRecords', fuel, id, fuelRecords, 'carga de combustible', loadFuelData);
-                form.reset();
-                document.getElementById('fuelId').value = '';
+                const success = await guardarRegistro('fuelRecords', fuel, id, fuelRecords, 'carga de combustible', loadFuelData, newForm);
+                if (success) {
+                    newForm.reset();
+                    document.getElementById('fuelId').value = '';
+                }
             });
             
             document.getElementById('togglePendientesCombustible')?.addEventListener('click', () => { 
@@ -1226,9 +1305,18 @@
         function setupSiniestroForm() {
             const form = document.getElementById('siniestroForm');
             if(!form) return;
-            form.addEventListener('submit', async (e) => {
+            
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            newForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if(currentUser.role !== 'admin') { alert('Solo administrador'); return; }
+                e.stopPropagation();
+                
+                if(currentUser.role !== 'admin') { 
+                    alert('Solo administrador'); 
+                    return; 
+                }
                 
                 const id = document.getElementById('siniestroId').value;
                 const siniestro = { 
@@ -1242,9 +1330,11 @@
                     centro: document.getElementById('centroSiniestro').value 
                 };
                 
-                await guardarRegistro('siniestros', siniestro, id, siniestros, 'siniestro', loadSiniestroData);
-                form.reset();
-                document.getElementById('siniestroId').value = '';
+                const success = await guardarRegistro('siniestros', siniestro, id, siniestros, 'siniestro', loadSiniestroData, newForm);
+                if (success) {
+                    newForm.reset();
+                    document.getElementById('siniestroId').value = '';
+                }
             });
         }
 
@@ -1291,9 +1381,18 @@
         function setupLavadoForm() {
             const form = document.getElementById('lavadoForm');
             if(!form) return;
-            form.addEventListener('submit', async (e) => {
+            
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
+            newForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if(currentUser.role !== 'admin') { alert('Solo administrador'); return; }
+                e.stopPropagation();
+                
+                if(currentUser.role !== 'admin') { 
+                    alert('Solo administrador'); 
+                    return; 
+                }
                 
                 const id = document.getElementById('lavadoId').value;
                 const lavado = { 
@@ -1304,9 +1403,11 @@
                     estadoPago: document.getElementById('estadoPagoLavado').value 
                 };
                 
-                await guardarRegistro('lavados', lavado, id, lavados, 'lavado', loadLavadoData);
-                form.reset();
-                document.getElementById('lavadoId').value = '';
+                const success = await guardarRegistro('lavados', lavado, id, lavados, 'lavado', loadLavadoData, newForm);
+                if (success) {
+                    newForm.reset();
+                    document.getElementById('lavadoId').value = '';
+                }
             });
             
             document.getElementById('togglePendientesLavado')?.addEventListener('click', () => { 
@@ -1375,6 +1476,10 @@
         function setupGasoilForm() {
             const form = document.getElementById('gasoilForm');
             if(!form) return;
+            
+            const newForm = form.cloneNode(true);
+            form.parentNode.replaceChild(newForm, form);
+            
             const calc = () => { 
                 const l = parseFloat(document.getElementById('litrosGasoil').value)||0; 
                 const f = parseFloat(document.getElementById('fleteGasoil').value)||0; 
@@ -1383,9 +1488,14 @@
             document.getElementById('litrosGasoil')?.addEventListener('input', calc);
             document.getElementById('fleteGasoil')?.addEventListener('input', calc);
             
-            form.addEventListener('submit', async (e) => {
+            newForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                if(currentUser.role !== 'admin') { alert('Solo administrador'); return; }
+                e.stopPropagation();
+                
+                if(currentUser.role !== 'admin') { 
+                    alert('Solo administrador'); 
+                    return; 
+                }
                 
                 const id = document.getElementById('gasoilId').value;
                 const litros = parseFloat(document.getElementById('litrosGasoil').value)||0;
@@ -1400,9 +1510,11 @@
                     estadoPago: document.getElementById('estadoPagoGasoil').value 
                 };
                 
-                await guardarRegistro('gasoilRecords', gasoil, id, gasoilRecords, 'gasoil', loadGasoilData);
-                form.reset();
-                document.getElementById('gasoilId').value = '';
+                const success = await guardarRegistro('gasoilRecords', gasoil, id, gasoilRecords, 'gasoil', loadGasoilData, newForm);
+                if (success) {
+                    newForm.reset();
+                    document.getElementById('gasoilId').value = '';
+                }
             });
             
             document.getElementById('togglePendientesGasoil')?.addEventListener('click', () => { 
@@ -1782,7 +1894,6 @@
                 if(item.placa) imported.push(item);
             }
             
-            // Guardar en Firebase y local
             const collectionMap = {
                 'vehicles': { array: vehicles, key: 'vehicles', callback: () => { loadVehicleData(); updatePlacasList(); cargarAnalisisCombustible(); } },
                 'maintenances': { array: maintenances, key: 'maintenances', callback: loadMaintenanceData },
