@@ -13,6 +13,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
+    <!-- Firebase SDK (versión modular compat) -->
     <script type="importmap">
         {
             "imports": {
@@ -45,12 +46,6 @@
         .form-grid { display: grid; gap: 1rem; }
         @media (min-width: 768px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1024px) { .form-grid { grid-template-columns: repeat(3, 1fr); } }
-        .tab-pane { display: none; }
-        .tab-pane:not(.hidden) { display: block; }
-        .loading-spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid #fff; border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; margin-right: 6px; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .confirm-delete { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; }
-        .confirm-delete-content { background: white; padding: 20px; border-radius: 8px; max-width: 400px; text-align: center; }
     </style>
 </head>
 <body>
@@ -77,8 +72,8 @@
                 <div id="loginError" class="text-red-600 text-sm text-center hidden">Contraseña incorrecta</div>
             </div>
             <div class="mt-6 text-xs text-center text-gray-500">
+                <p>🔒 Administrador: ••••••••</p>
                 <p>👤 Chofer: Inter1234</p>
-                <p class="text-gray-400">🔒 Administrador: Adminltq23</p>
             </div>
         </div>
     </div>
@@ -148,7 +143,7 @@
                         <div class="responsive-table"><table class="min-w-full bg-white border border-gray-200" id="vehicleTable"><thead><tr class="bg-gray-200 uppercase text-xs md:text-sm"><th class="py-3 px-4 text-left">Placa</th><th class="py-3 px-4 text-left">Marca/Modelo</th><th class="py-3 px-4 text-left">Tipo</th><th class="py-3 px-4 text-left">Año</th><th class="py-3 px-4 text-left">Centro</th><th class="py-3 px-4 text-left">Kilometraje</th><th class="py-3 px-4 text-left">Cap. Tanque</th><th class="py-3 px-4 text-left">Estado</th><th class="py-3 px-4 text-center">Acciones</th> </thead><tbody id="vehicleTableBody"></tbody></table></div>
                     </div>
 
-                    <!-- MANTENIMIENTOS - VERSIÓN COMPLETA CON TODOS LOS CAMPOS (como en Caracas) -->
+                    <!-- MANTENIMIENTOS -->
                     <div id="mantenimientos" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Registro de Mantenimientos</h2>
                         <form id="maintenanceForm" class="form-grid mb-6">
@@ -156,14 +151,8 @@
                             <div><label for="placaMantenimiento" class="block text-sm font-medium text-gray-700">Placa</label><input list="placasList" id="placaMantenimiento" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-inter-primary p-2" required><datalist id="placasList"></datalist></div>
                             <div><label for="tipoMantenimiento" class="block text-sm font-medium text-gray-700">Tipo</label><select id="tipoMantenimiento" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-inter-primary p-2" required><option value="" disabled selected>Seleccione</option><option value="preventivo">Preventivo</option><option value="correctivo">Correctivo</option></select></div>
                             <div><label for="estadoPagoMantenimiento" class="block text-sm font-medium text-gray-700">Estado de Pago</label><select id="estadoPagoMantenimiento" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-inter-primary p-2" required><option value="pendiente">Pendiente</option><option value="pagado">Pagado</option></select></div>
-                            <div id="camposPreventivo" class="hidden col-span-full grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label for="kilometrajePreventivo">Kilometraje</label><input type="number" id="kilometrajePreventivo" class="mt-1 block w-full rounded-md border-gray-300 p-2"></div>
-                                <div><label for="descripcionPreventivo">Descripción</label><textarea id="descripcionPreventivo" rows="2" class="mt-1 block w-full rounded-md border-gray-300 p-2"></textarea></div>
-                            </div>
-                            <div id="camposCorrectivo" class="hidden col-span-full grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label for="descripcionCorrectivo">Descripción</label><textarea id="descripcionCorrectivo" rows="2" class="mt-1 block w-full rounded-md border-gray-300 p-2"></textarea></div>
-                                <div><label for="causaCorrectivo">Causa</label><input type="text" id="causaCorrectivo" class="mt-1 block w-full rounded-md border-gray-300 p-2"></div>
-                            </div>
+                            <div id="camposPreventivo" class="hidden col-span-full"><label for="kilometrajePreventivo">Kilometraje</label><input type="number" id="kilometrajePreventivo" class="mt-1 block w-full rounded-md border-gray-300 p-2"><label for="descripcionPreventivo" class="mt-2">Descripción</label><textarea id="descripcionPreventivo" rows="2" class="mt-1 block w-full rounded-md border-gray-300 p-2"></textarea></div>
+                            <div id="camposCorrectivo" class="hidden col-span-full"><label for="descripcionCorrectivo">Descripción</label><textarea id="descripcionCorrectivo" rows="2" class="mt-1 block w-full rounded-md border-gray-300 p-2"></textarea><label for="causaCorrectivo" class="mt-2">Causa</label><input type="text" id="causaCorrectivo" class="mt-1 block w-full rounded-md border-gray-300 p-2"></div>
                             <div><label for="fechaMantenimiento">Fecha</label><input type="date" id="fechaMantenimiento" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
                             <div><label for="costoMantenimiento">Costo</label><input type="number" id="costoMantenimiento" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
                             <div><label for="proveedorTaller">Proveedor/Taller</label><input type="text" id="proveedorTaller" class="mt-1 block w-full rounded-md border-gray-300 p-2" required></div>
@@ -178,7 +167,7 @@
                         <div class="responsive-table"><table class="min-w-full bg-white border" id="maintenanceTable"><thead><tr class="bg-gray-200 uppercase text-xs"><th>Placa</th><th>Tipo</th><th>Fecha</th><th>Costo</th><th>Proveedor</th><th>Centro</th><th>Estado</th><th>Descripción</th><th>Acciones</th> </thead><tbody id="maintenanceTableBody"></tbody></table></div>
                     </div>
 
-                    <!-- INSPECCIÓN -->
+                    <!-- INSPECCIÓN (CON HORA DE VENEZUELA) -->
                     <div id="inspeccion" class="tab-pane hidden">
                         <h2 class="text-xl font-semibold text-inter-primary mb-4">Inspección Pre-Operacional</h2>
                         <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6"><p class="text-blue-700 font-medium">⚠️ Complete todos los campos obligatorios (*)</p></div>
@@ -233,7 +222,7 @@
                             <div class="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500"><p class="text-2xl font-bold text-purple-600" id="totalFrecuentes">0</p><p class="text-sm text-purple-600">Cargas Frecuentes</p></div>
                         </div>
                         <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6"><h3 class="text-lg font-semibold p-4 bg-gray-100 border-b">🚨 Alertas por Vehículo</h3><div class="responsive-table"><table class="min-w-full bg-white" id="alertasTable"><thead class="bg-gray-200"><tr><th class="py-2 px-3 text-left">Placa</th><th class="py-2 px-3 text-left">Vehículo</th><th class="py-2 px-3 text-left">Tipo</th><th class="py-2 px-3 text-left">Rendimiento Actual</th><th class="py-2 px-3 text-left">Rendimiento Esperado</th><th class="py-2 px-3 text-left">Días desde última carga</th><th class="py-2 px-3 text-left">Alertas</th> </thead><tbody id="alertasTableBody"></tbody></table></div></div>
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden"><h3 class="text-lg font-semibold p-4 bg-gray-100 border-b">📋 Historial de Cargas por Vehículo</h3><div class="responsive-table"><table class="min-w-full bg-white" id="detalleCargasTable"><thead class="bg-gray-200"><tr><th class="py-2 px-3 text-left">Placa</th><th class="py-2 px-3 text-left">Fecha</th><th class="py-2 px-3 text-left">Kilometraje</th><th class="py-2 px-3 text-left">Litros</th><th class="py-2 px-3 text-left">Km recorridos</th><th class="py-2 px-3 text-left">Rendimiento (km/L)</th><th class="py-2 px-3 text-left">Días hasta siguiente carga</th><th class="py-2 px-3 text-left">Estado</th> </thead><tbody id="detalleCargasTableBody"></tbody></table></div></div>
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden"><h3 class="text-lg font-semibold p-4 bg-gray-100 border-b">📋 Historial de Cargas por Vehículo</h3><div class="responsive-table"><table class="min-w-full bg-white" id="detalleCargasTable"><thead class="bg-gray-200"><tr><th class="py-2 px-3 text-left">Placa</th><th class="py-2 px-3 text-left">Fecha</th><th class="py-2 px-3 text-left">Kilometraje</th><th class="py-2 px-3 text-left">Litros</th><th class="py-2 px-3 text-left">Km desde última carga</th><th class="py-2 px-3 text-left">Rendimiento (km/L)</th><th class="py-2 px-3 text-left">Días desde última</th><th class="py-2 px-3 text-left">Estado</th> </thead><tbody id="detalleCargasTableBody"></tbody></table></div></div>
                     </div>
 
                     <!-- SINIESTROS -->
@@ -327,16 +316,18 @@
 
     <script type="module">
         import { initializeApp } from "firebase/app";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, serverTimestamp } from "firebase/firestore";
+        import { getFirestore } from "firebase/firestore";
         
-	const firebaseConfig = {
-	  apiKey: "AIzaSyAdU-AsKmIy41z46o49wCsJD4kCny008I0",
-	  authDomain: "flota-per23.firebaseapp.com",
-	  projectId: "flota-per23",
-	  storageBucket: "flota-per23.firebasestorage.app",
-	  messagingSenderId: "460396516570",
-	  appId: "1:460396516570:web:d49acb05d934e1c6a581e3"
-	};
+        // ============ CONFIGURACIÓN DE FIREBASE (ACTUALIZADA) ============
+        const firebaseConfig = {
+            apiKey: "AIzaSyAdU-AsKmIy41z46o49wCsJD4kCny008I0",
+            authDomain: "flota-per23.firebaseapp.com",
+            databaseURL: "https://flota-per23-default-rtdb.firebaseio.com",
+            projectId: "flota-per23",
+            storageBucket: "flota-per23.firebasestorage.app",
+            messagingSenderId: "460396516570",
+            appId: "1:460396516570:web:d49acb05d934e1c6a581e3"
+        };
         
         let db = null;
         let firebaseInicializado = false;
@@ -345,20 +336,23 @@
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
             firebaseInicializado = true;
-            console.log('✅ Firebase inicializado');
+            console.log('✅ Firebase inicializado correctamente');
         } catch (error) {
             console.warn('⚠️ Error Firebase:', error);
         }
 
+        // Exponer db globalmente para uso en funciones no-module
         window.db = db;
         window.firebaseInicializado = firebaseInicializado;
 
+        // ============ FUNCIÓN PARA OBTENER HORA DE VENEZUELA ============
         function getHoraVenezuela() {
             const ahora = new Date();
             const horaVenezuela = new Date(ahora.toLocaleString("en-US", { timeZone: "America/Caracas" }));
             return horaVenezuela.toTimeString().slice(0, 5);
         }
 
+        // ============ VARIABLES GLOBALES ============
         let vehicles = [];
         let maintenances = [];
         let inspections = [];
@@ -381,70 +375,307 @@
             camion_pesado: { min: 3, max: 4, promedio: 3.5 }
         };
 
-        const USERS = { admin: { password: 'Adminltq23', role: 'admin', name: 'Administrador' }, chofer: { password: 'Inter1234', role: 'chofer', name: 'Chofer' } };
+        const USERS = { admin: { password: 'Admingua28', role: 'admin', name: 'Administrador' }, chofer: { password: 'Inter1234', role: 'chofer', name: 'Chofer' } };
 
-        function formatearFecha(fechaInput) {
-            if (!fechaInput) return 'N/A';
-            if (typeof fechaInput === 'string' && fechaInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                const [y,m,d] = fechaInput.split('-').map(Number);
-                return new Date(y,m-1,d).toLocaleDateString('es-ES');
+        // ============ FUNCIONES DE ANÁLISIS DE COMBUSTIBLE ============
+        function calcularRendimiento(kmRecorridos, litros) {
+            if (!kmRecorridos || !litros || litros === 0) return 0;
+            return kmRecorridos / litros;
+        }
+
+        function obtenerRendimientoEsperado(vehiculo) {
+            if (!vehiculo || !vehiculo.tipoVehiculo) return 10;
+            const tipo = vehiculo.tipoVehiculo;
+            return rendimientoEsperado[tipo]?.promedio || 10;
+        }
+
+        function obtenerEstadoRendimiento(rendimientoActual, rendimientoEsperado) {
+            if (rendimientoActual === 0) return { estado: "sin_datos", clase: "bg-gray-100", texto: "Sin datos", mensaje: "" };
+            const porcentaje = (rendimientoActual / rendimientoEsperado) * 100;
+            if (porcentaje < 50) return { estado: "critico", clase: "alerta-critica", texto: "🔴 CRÍTICO", mensaje: `Rendimiento ${porcentaje.toFixed(0)}% del esperado` };
+            if (porcentaje < 80) return { estado: "advertencia", clase: "alerta-advertencia", texto: "🟡 ADVERTENCIA", mensaje: `Rendimiento ${porcentaje.toFixed(0)}% del esperado` };
+            return { estado: "normal", clase: "rendimiento-bueno", texto: "✅ NORMAL", mensaje: "Rendimiento adecuado" };
+        }
+
+        function obtenerDiasDesdeUltimaCarga(placa) {
+            const cargasVehiculo = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            if (cargasVehiculo.length === 0) return null;
+            const ultimaCarga = new Date(cargasVehiculo[0].fecha);
+            const hoy = new Date();
+            const diffTime = Math.abs(hoy - ultimaCarga);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
+        function obtenerFrecuenciaCargas(placa) {
+            const cargasVehiculo = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+            if (cargasVehiculo.length < 2) return null;
+            let totalDias = 0;
+            for (let i = 1; i < cargasVehiculo.length; i++) {
+                const fechaAnt = new Date(cargasVehiculo[i-1].fecha);
+                const fechaAct = new Date(cargasVehiculo[i].fecha);
+                totalDias += (fechaAct - fechaAnt) / (1000 * 60 * 60 * 24);
             }
-            return new Date(fechaInput).toLocaleDateString('es-ES');
+            return totalDias / (cargasVehiculo.length - 1);
         }
 
-        function formatearFechaHora(fecha, hora) {
-            if (!fecha) return 'N/A';
-            const fechaFormateada = formatearFecha(fecha);
-            if (hora) return `${fechaFormateada} ${hora}`;
-            return fechaFormateada;
+        function generarAlertasVehiculo(vehiculo) {
+            const alertas = [];
+            const rendimientoActual = obtenerUltimoRendimiento(vehiculo.placa);
+            const esperado = obtenerRendimientoEsperado(vehiculo);
+            const estadoRendimiento = obtenerEstadoRendimiento(rendimientoActual, esperado);
+            
+            if (estadoRendimiento.estado === "critico") alertas.push({ tipo: "critico", mensaje: estadoRendimiento.mensaje });
+            else if (estadoRendimiento.estado === "advertencia") alertas.push({ tipo: "advertencia", mensaje: estadoRendimiento.mensaje });
+            
+            const diasUltimaCarga = obtenerDiasDesdeUltimaCarga(vehiculo.placa);
+            if (diasUltimaCarga !== null && diasUltimaCarga > 15) {
+                alertas.push({ tipo: "revision", mensaje: `${diasUltimaCarga} días sin cargar combustible` });
+            }
+            
+            const frecuencia = obtenerFrecuenciaCargas(vehiculo.placa);
+            if (frecuencia !== null && frecuencia < 3) {
+                alertas.push({ tipo: "frecuente", mensaje: `Carga cada ${frecuencia.toFixed(1)} días (muy frecuente)` });
+            }
+            
+            return alertas;
         }
 
-        function ordenarPorFecha(datos, campoFecha = 'fecha') {
-            return datos.slice().sort((a,b) => new Date(b[campoFecha] || b.fechaHora || b.fecha) - new Date(a[campoFecha] || a.fechaHora || a.fecha));
+        function obtenerUltimoRendimiento(placa) {
+            const cargasVehiculo = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            if (cargasVehiculo.length < 2) return 0;
+            
+            let totalKm = 0, totalLitros = 0;
+            for (let i = 1; i < cargasVehiculo.length; i++) {
+                const kmRecorridos = cargasVehiculo[i-1].kilometraje - cargasVehiculo[i].kilometraje;
+                if (kmRecorridos > 0 && kmRecorridos < 5000) {
+                    totalKm += kmRecorridos;
+                    totalLitros += cargasVehiculo[i-1].litros;
+                }
+            }
+            return totalLitros > 0 ? totalKm / totalLitros : 0;
         }
 
-        function updatePlacasList() {
-            const placasList = document.getElementById('placasList');
-            if(placasList) { placasList.innerHTML = ''; vehicles.forEach(v => { const opt = document.createElement('option'); opt.value = v.placa; placasList.appendChild(opt); }); }
+        function obtenerDetalleCargasVehiculo(placa) {
+            const cargas = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+            const detalle = [];
+            for (let i = 0; i < cargas.length - 1; i++) {
+                const cargaActual = cargas[i];
+                const cargaAnterior = cargas[i+1];
+                const kmRecorridos = cargaActual.kilometraje - cargaAnterior.kilometraje;
+                if (kmRecorridos > 0 && kmRecorridos < 5000) {
+                    const rendimiento = calcularRendimiento(kmRecorridos, cargaActual.litros);
+                    const fechaActual = new Date(cargaActual.fecha);
+                    const fechaAnterior = new Date(cargaAnterior.fecha);
+                    const diasDiferencia = Math.ceil((fechaActual - fechaAnterior) / (1000 * 60 * 60 * 24));
+                    detalle.push({
+                        fecha: cargaActual.fecha,
+                        kilometraje: cargaActual.kilometraje,
+                        litros: cargaActual.litros,
+                        kmRecorridos: kmRecorridos,
+                        rendimiento: rendimiento,
+                        diasDesdeAnterior: diasDiferencia
+                    });
+                }
+            }
+            return detalle;
         }
 
+        function cargarAnalisisCombustible() {
+            if (!currentUser || currentUser.role !== 'admin') return;
+            
+            const alertasPorVehiculo = [];
+            let totalCriticas = 0, totalAdvertencias = 0, totalRevision = 0, totalFrecuentes = 0;
+            
+            for (const vehiculo of vehicles) {
+                const alertas = generarAlertasVehiculo(vehiculo);
+                const rendimientoActual = obtenerUltimoRendimiento(vehiculo.placa);
+                const esperado = obtenerRendimientoEsperado(vehiculo);
+                const estadoRendimiento = obtenerEstadoRendimiento(rendimientoActual, esperado);
+                const diasUltimaCarga = obtenerDiasDesdeUltimaCarga(vehiculo.placa);
+                
+                for (const alerta of alertas) {
+                    if (alerta.tipo === 'critico') totalCriticas++;
+                    else if (alerta.tipo === 'advertencia') totalAdvertencias++;
+                    else if (alerta.tipo === 'revision') totalRevision++;
+                    else if (alerta.tipo === 'frecuente') totalFrecuentes++;
+                }
+                
+                alertasPorVehiculo.push({
+                    placa: vehiculo.placa,
+                    marca: vehiculo.marca,
+                    modelo: vehiculo.modelo,
+                    tipo: vehiculo.tipoVehiculo || 'sedan',
+                    rendimientoActual: rendimientoActual.toFixed(2),
+                    rendimientoEsperado: esperado,
+                    estadoRendimiento: estadoRendimiento,
+                    diasUltimaCarga: diasUltimaCarga,
+                    alertas: alertas
+                });
+            }
+            
+            document.getElementById('totalCriticas').textContent = totalCriticas;
+            document.getElementById('totalAdvertencias').textContent = totalAdvertencias;
+            document.getElementById('totalRevision').textContent = totalRevision;
+            document.getElementById('totalFrecuentes').textContent = totalFrecuentes;
+            
+            const tbodyAlertas = document.getElementById('alertasTableBody');
+            if (tbodyAlertas) {
+                tbodyAlertas.innerHTML = '';
+                for (const item of alertasPorVehiculo) {
+                    const row = tbodyAlertas.insertRow();
+                    const alertasHtml = item.alertas.map(a => `<span class="inline-block px-2 py-1 text-xs rounded ${a.tipo === 'critico' ? 'bg-red-100 text-red-700' : a.tipo === 'advertencia' ? 'bg-yellow-100 text-yellow-700' : a.tipo === 'revision' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'} mr-1">${a.mensaje}</span>`).join('');
+                    row.innerHTML = `<td class="py-2 px-3 font-semibold">${item.placa}</td><td class="py-2 px-3">${item.marca} ${item.modelo}</td><td class="py-2 px-3">${item.tipo}</td><td class="py-2 px-3 ${item.estadoRendimiento.clase}">${item.rendimientoActual} km/L</td><td class="py-2 px-3">${item.rendimientoEsperado} km/L</td><td class="py-2 px-3">${item.diasUltimaCarga !== null ? item.diasUltimaCarga + ' días' : 'Sin cargas'}</td><td class="py-2 px-3">${alertasHtml || '✅ Sin alertas'}</td>`;
+                }
+            }
+            
+            const tbodyDetalle = document.getElementById('detalleCargasTableBody');
+            if (tbodyDetalle) {
+                tbodyDetalle.innerHTML = '';
+                for (const vehiculo of vehicles) {
+                    const detalle = obtenerDetalleCargasVehiculo(vehiculo.placa);
+                    for (const carga of detalle) {
+                        const esperado = obtenerRendimientoEsperado(vehiculo);
+                        const estado = obtenerEstadoRendimiento(carga.rendimiento, esperado);
+                        const row = tbodyDetalle.insertRow();
+                        row.innerHTML = `<td class="py-2 px-3 font-semibold">${vehiculo.placa}</td><td class="py-2 px-3">${formatearFecha(carga.fecha)}</td><td class="py-2 px-3">${carga.kilometraje} km</td><td class="py-2 px-3">${carga.litros} L</td><td class="py-2 px-3">${carga.kmRecorridos} km</td><td class="py-2 px-3 ${estado.clase}">${carga.rendimiento.toFixed(2)} km/L</td><td class="py-2 px-3">${carga.diasDesdeAnterior} días</td><td class="py-2 px-3">${estado.texto}</td>`;
+                    }
+                }
+            }
+        }
+
+        // ============ FUNCIONES DE INICIALIZACIÓN ============
+        function init() {
+            console.log('Iniciando Gestión de Flota U.N Los Teques');
+            
+            console.log('📂 Cargando datos existentes...');
+            
+            const horaInput = document.getElementById('horaInspeccion');
+            if (horaInput) {
+                horaInput.value = getHoraVenezuela();
+            }
+            
+            document.getElementById('loginButton').addEventListener('click', handleLogin);
+            document.getElementById('loginPassword').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+            document.getElementById('logoutButton').addEventListener('click', logout);
+            initializeTabs();
+            checkAuth();
+        }
+
+        function checkAuth() {
+            const savedUser = localStorage.getItem('fleetCurrentUser');
+            if (savedUser) { currentUser = JSON.parse(savedUser); showApp(); }
+            else { showLogin(); }
+        }
+
+        function showLogin() { document.getElementById('loginContainer').style.display = 'flex'; document.getElementById('appContainer').style.display = 'none'; }
+        
+        function showApp() {
+            document.getElementById('loginContainer').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('userRole').textContent = currentUser.role === 'admin' ? '👑 Administrador' : '👤 Chofer';
+            loadLocalData();
+            configureTabsForRole();
+            loadAllData();
+            setupAllForms();
+            setupSearchFunctionality();
+            setupYearSelector();
+            setupReporteAnioSelector();
+            updateReports();
+            updateTotalPendienteHeader();
+            actualizarVistaPreviaReporte();
+            cargarAnalisisCombustible();
+            
+            if (currentUser.role === 'admin' && firebaseInicializado && window.db) {
+                document.getElementById('syncButton').style.display = 'inline-block';
+                document.getElementById('syncButton').addEventListener('click', syncAllWithFirebase);
+            } else { document.getElementById('syncButton').style.display = 'none'; }
+            
+            if (currentUser.role === 'admin') {
+                setupExportButtons();
+                setupImportButtons();
+                setupReporteMensualPDFListeners();
+            }
+        }
+
+        function configureTabsForRole() {
+            const tabs = document.querySelectorAll('.tab-link');
+            if (currentUser.role === 'chofer') {
+                tabs.forEach(tab => { if(tab.getAttribute('data-tab-id') !== 'inspeccion') tab.style.display = 'none'; else tab.style.display = 'inline-block'; });
+                document.querySelectorAll('[id*="import"], [id*="export"], #deleteMassiveBtn, #togglePendientesMantenimiento, #togglePendientesCombustible, #togglePendientesLavado, #togglePendientesGasoil, #applyFilters, #mostrarSoloPendientesReporte').forEach(btn => { if(btn) btn.style.display = 'none'; });
+                setTimeout(() => { const tab = document.querySelector('[data-tab-id="inspeccion"]'); if(tab) tab.click(); }, 100);
+            } else {
+                tabs.forEach(tab => tab.style.display = 'inline-block');
+                setTimeout(() => { if(tabs.length) tabs[0].click(); }, 100);
+            }
+        }
+
+        function handleLogin() {
+            const profile = document.getElementById('loginProfile').value;
+            const password = document.getElementById('loginPassword').value;
+            if (USERS[profile] && USERS[profile].password === password) {
+                currentUser = { role: USERS[profile].role, name: USERS[profile].name };
+                localStorage.setItem('fleetCurrentUser', JSON.stringify(currentUser));
+                document.getElementById('loginError').classList.add('hidden');
+                showApp();
+            } else { document.getElementById('loginError').classList.remove('hidden'); }
+        }
+
+        function logout() { localStorage.removeItem('fleetCurrentUser'); currentUser = null; showLogin(); document.getElementById('loginPassword').value = ''; }
+
+        function loadLocalData() {
+            vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
+            maintenances = JSON.parse(localStorage.getItem('maintenances')) || [];
+            inspections = JSON.parse(localStorage.getItem('inspections')) || [];
+            fuelRecords = JSON.parse(localStorage.getItem('fuelRecords')) || [];
+            siniestros = JSON.parse(localStorage.getItem('siniestros')) || [];
+            lavados = JSON.parse(localStorage.getItem('lavados')) || [];
+            gasoilRecords = JSON.parse(localStorage.getItem('gasoilRecords')) || [];
+            console.log(`📊 Datos cargados: ${vehicles.length} vehículos, ${maintenances.length} mantenimientos, ${fuelRecords.length} cargas`);
+        }
+
+        // ============ FUNCIONES DE FIREBASE ============
         async function saveToFirebase(collectionName, data) { 
-            if (!firebaseInicializado || !db) return null; 
+            if (!firebaseInicializado || !window.db) return null; 
             try { 
-                const docRef = await addDoc(collection(db, collectionName), { ...data, createdAt: serverTimestamp() }); 
+                const { collection, addDoc, serverTimestamp } = await import("firebase/firestore");
+                const docRef = await addDoc(collection(window.db, collectionName), { ...data, createdAt: serverTimestamp() }); 
                 return docRef.id; 
             } catch(e) { console.error("Error saving:", e); return null; } 
         }
         
         async function loadFromFirebase(collectionName) { 
-            if (!firebaseInicializado || !db) return []; 
+            if (!firebaseInicializado || !window.db) return []; 
             try { 
-                const querySnapshot = await getDocs(collection(db, collectionName)); 
+                const { collection, getDocs } = await import("firebase/firestore");
+                const snapshot = await getDocs(collection(window.db, collectionName)); 
                 const data = []; 
-                querySnapshot.forEach(doc => data.push({ firebaseId: doc.id, ...doc.data() })); 
+                snapshot.forEach(doc => data.push({ firebaseId: doc.id, ...doc.data() })); 
                 return data; 
             } catch(e) { console.error("Error loading:", e); return []; } 
         }
         
         async function updateInFirebase(collectionName, docId, data) { 
-            if (!firebaseInicializado || !db) return false; 
+            if (!firebaseInicializado || !window.db) return false; 
             try { 
-                await updateDoc(doc(db, collectionName, docId), { ...data, updatedAt: serverTimestamp() }); 
+                const { doc, updateDoc, serverTimestamp } = await import("firebase/firestore");
+                await updateDoc(doc(window.db, collectionName, docId), { ...data, updatedAt: serverTimestamp() }); 
                 return true; 
             } catch(e) { console.error("Error updating:", e); return false; } 
         }
         
         async function deleteFromFirebase(collectionName, docId) { 
-            if (!firebaseInicializado || !db) return false; 
+            if (!firebaseInicializado || !window.db) return false; 
             try { 
-                await deleteDoc(doc(db, collectionName, docId)); 
+                const { doc, deleteDoc } = await import("firebase/firestore");
+                await deleteDoc(doc(window.db, collectionName, docId)); 
                 return true; 
             } catch(e) { console.error("Error deleting:", e); return false; } 
         }
 
         async function syncAllWithFirebase() {
             if (currentUser.role !== 'admin') return;
-            if (!firebaseInicializado || !db) { alert('⚠️ Firebase no configurado'); return; }
+            if (!firebaseInicializado || !window.db) { alert('⚠️ Firebase no configurado'); return; }
             try {
                 updateSyncStatus('loading', 'Sincronizando...');
                 const fbVehicles = await loadFromFirebase('vehicles');
@@ -475,7 +706,7 @@
                 updateReports();
                 updateTotalPendienteHeader();
                 actualizarVistaPreviaReporte();
-                cargarAnalisisCombustibleCompleto();
+                cargarAnalisisCombustible();
                 updateSyncStatus('success', 'Sincronizado');
                 alert('✅ Datos sincronizados correctamente');
             } catch(e) { 
@@ -489,204 +720,36 @@
             if(el) { el.textContent = message; el.className = 'text-sm px-2 py-1 rounded ' + (type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-yellow-500') + ' text-white'; }
         }
 
-        function obtenerUltimoRendimiento(placa) {
-            const cargasVehiculo = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-            if (cargasVehiculo.length < 2) return 0;
-            let totalKm = 0, totalLitros = 0;
-            for (let i = 1; i < cargasVehiculo.length; i++) {
-                const kmRecorridos = cargasVehiculo[i-1].kilometraje - cargasVehiculo[i].kilometraje;
-                if (kmRecorridos > 0 && kmRecorridos < 5000) {
-                    totalKm += kmRecorridos;
-                    totalLitros += cargasVehiculo[i-1].litros;
-                }
+        // ============ FUNCIONES DE UTILIDAD ============
+        function formatearFecha(fechaInput) {
+            if (!fechaInput) return 'N/A';
+            if (typeof fechaInput === 'string' && fechaInput.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const [y,m,d] = fechaInput.split('-').map(Number);
+                return new Date(y,m-1,d).toLocaleDateString('es-ES');
             }
-            return totalLitros > 0 ? totalKm / totalLitros : 0;
+            return new Date(fechaInput).toLocaleDateString('es-ES');
         }
 
-        function obtenerRendimientoEsperadoVehiculo(vehiculo) {
-            if (!vehiculo || !vehiculo.tipoVehiculo) return 10;
-            return rendimientoEsperado[vehiculo.tipoVehiculo]?.promedio || 10;
+        function formatearFechaHora(fecha, hora) {
+            if (!fecha) return 'N/A';
+            const fechaFormateada = formatearFecha(fecha);
+            if (hora) {
+                return `${fechaFormateada} ${hora}`;
+            }
+            return fechaFormateada;
         }
 
-        function obtenerEstadoRendimientoVehiculo(rendimientoActual, rendimientoEsperado) {
-            if (rendimientoActual === 0) return { estado: "sin_datos", clase: "bg-gray-100", texto: "Sin datos", mensaje: "" };
-            const porcentaje = (rendimientoActual / rendimientoEsperado) * 100;
-            if (porcentaje < 50) return { estado: "critico", clase: "alerta-critica", texto: "🔴 CRÍTICO", mensaje: `Rendimiento ${porcentaje.toFixed(0)}% del esperado` };
-            if (porcentaje < 80) return { estado: "advertencia", clase: "alerta-advertencia", texto: "🟡 ADVERTENCIA", mensaje: `Rendimiento ${porcentaje.toFixed(0)}% del esperado` };
-            return { estado: "normal", clase: "rendimiento-bueno", texto: "✅ NORMAL", mensaje: "Rendimiento adecuado" };
+        function ordenarPorFecha(datos, campoFecha = 'fecha') {
+            return datos.slice().sort((a,b) => new Date(b[campoFecha] || b.fechaHora || b.fecha) - new Date(a[campoFecha] || a.fechaHora || a.fecha));
         }
 
-        function obtenerDiasDesdeUltimaCarga(placa) {
-            const cargasVehiculo = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-            if (cargasVehiculo.length === 0) return null;
-            const ultimaCarga = new Date(cargasVehiculo[0].fecha);
-            const hoy = new Date();
-            const diffTime = Math.abs(hoy - ultimaCarga);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays;
+        function updatePlacasList() {
+            const placasList = document.getElementById('placasList');
+            if(placasList) { placasList.innerHTML = ''; vehicles.forEach(v => { const opt = document.createElement('option'); opt.value = v.placa; placasList.appendChild(opt); }); }
         }
 
-        function obtenerFrecuenciaCargas(placa) {
-            const cargas = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-            if (cargas.length < 2) return null;
-            let totalDias = 0;
-            for (let i = 1; i < cargas.length; i++) {
-                const fechaAnt = new Date(cargas[i-1].fecha);
-                const fechaAct = new Date(cargas[i].fecha);
-                totalDias += Math.floor((fechaAct - fechaAnt) / (1000 * 60 * 60 * 24));
-            }
-            const promedioDias = totalDias / (cargas.length - 1);
-            return { promedioDias: promedioDias.toFixed(1), totalCargas: cargas.length };
-        }
-
-        // Historial de Cargas con rendimiento en carga ANTERIOR
-        function cargarHistorialCargas() {
-            const tbody = document.getElementById('detalleCargasTableBody');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            if (fuelRecords.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="8" class="text-center py-4 text-gray-500">No hay registros de combustible para mostrar</td>';
-                return;
-            }
-            
-            const cargasPorPlaca = {};
-            for (const carga of fuelRecords) {
-                if (!cargasPorPlaca[carga.placa]) cargasPorPlaca[carga.placa] = [];
-                cargasPorPlaca[carga.placa].push(carga);
-            }
-            
-            for (const placa in cargasPorPlaca) {
-                let cargas = cargasPorPlaca[placa].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-                
-                for (let i = 1; i < cargas.length; i++) {
-                    const cargaActual = cargas[i];
-                    const cargaAnterior = cargas[i-1];
-                    
-                    let kmRecorridos = null;
-                    let rendimiento = null;
-                    let estadoClase = '';
-                    
-                    if (cargaActual.kilometraje && cargaAnterior.kilometraje) {
-                        kmRecorridos = cargaActual.kilometraje - cargaAnterior.kilometraje;
-                        
-                        if (kmRecorridos > 0 && kmRecorridos < 5000 && cargaAnterior.litros > 0) {
-                            rendimiento = kmRecorridos / cargaAnterior.litros;
-                            const vehiculo = vehicles.find(v => v.placa === placa);
-                            if (vehiculo) {
-                                const esperado = obtenerRendimientoEsperadoVehiculo(vehiculo);
-                                if (rendimiento < esperado * 0.6) estadoClase = 'text-red-600 font-bold';
-                                else if (rendimiento < esperado * 0.8) estadoClase = 'text-yellow-600 font-semibold';
-                                else estadoClase = 'text-green-600';
-                            }
-                        }
-                    }
-                    
-                    cargaAnterior._kmRecorridos = kmRecorridos;
-                    cargaAnterior._rendimiento = rendimiento;
-                    cargaAnterior._estadoClase = estadoClase;
-                    cargaAnterior._fechaSiguiente = cargaActual.fecha;
-                }
-                
-                for (let i = 0; i < cargas.length; i++) {
-                    const carga = cargas[i];
-                    
-                    let kmRecorridosTexto = '-';
-                    let rendimientoTexto = '-';
-                    let estadoClase = '';
-                    let diasHastaSiguienteTexto = '-';
-                    
-                    if (carga._kmRecorridos !== undefined && carga._kmRecorridos !== null) {
-                        kmRecorridosTexto = carga._kmRecorridos + ' km';
-                        if (carga._rendimiento !== null && carga._rendimiento !== undefined) {
-                            rendimientoTexto = carga._rendimiento.toFixed(2) + ' km/L';
-                            estadoClase = carga._estadoClase || '';
-                        } else if (carga._kmRecorridos > 0) {
-                            rendimientoTexto = 'Pendiente (sin litros)';
-                        }
-                    }
-                    
-                    if (carga._fechaSiguiente) {
-                        const fechaAct = new Date(carga.fecha);
-                        const fechaSig = new Date(carga._fechaSiguiente);
-                        const diffDays = Math.floor((fechaSig - fechaAct) / (1000 * 60 * 60 * 24));
-                        diasHastaSiguienteTexto = diffDays + ' días';
-                    }
-                    
-                    const row = tbody.insertRow();
-                    row.innerHTML = `
-                        <td class="py-2 px-3 font-semibold">${carga.placa}</td>
-                        <td class="py-2 px-3">${formatearFecha(carga.fecha)}</td>
-                        <td class="py-2 px-3">${carga.kilometraje} km</td>
-                        <td class="py-2 px-3">${carga.litros} L</td>
-                        <td class="py-2 px-3">${kmRecorridosTexto}</td>
-                        <td class="py-2 px-3 ${estadoClase}">${rendimientoTexto}</td>
-                        <td class="py-2 px-3">${diasHastaSiguienteTexto}</td>
-                        <td class="py-2 px-3">
-                            <span class="${carga.estadoPago === 'pagado' ? 'badge-pagado' : 'badge-pendiente'}">
-                                ${(carga.estadoPago || 'PENDIENTE').toUpperCase()}
-                            </span>
-                        </td>
-                    `;
-                }
-            }
-        }
-
-        function cargarAnalisisCombustibleCompleto() {
-            if (!currentUser || currentUser.role !== 'admin') return;
-            
-            const alertasPorVehiculo = [];
-            let totalCriticas = 0, totalAdvertencias = 0, totalRevision = 0, totalFrecuentes = 0;
-            
-            for (const vehiculo of vehicles) {
-                const alertas = [];
-                const rendimientoActual = obtenerUltimoRendimiento(vehiculo.placa);
-                const esperado = obtenerRendimientoEsperadoVehiculo(vehiculo);
-                const estadoRendimiento = obtenerEstadoRendimientoVehiculo(rendimientoActual, esperado);
-                if (estadoRendimiento.estado === "critico") alertas.push({ tipo: "critico", mensaje: estadoRendimiento.mensaje });
-                else if (estadoRendimiento.estado === "advertencia") alertas.push({ tipo: "advertencia", mensaje: estadoRendimiento.mensaje });
-                
-                const diasUltimaCarga = obtenerDiasDesdeUltimaCarga(vehiculo.placa);
-                if (diasUltimaCarga !== null && diasUltimaCarga > 15) alertas.push({ tipo: "revision", mensaje: `${diasUltimaCarga} días sin cargar combustible` });
-                
-                const frecuencia = obtenerFrecuenciaCargas(vehiculo.placa);
-                if (frecuencia && frecuencia.promedioDias < 3 && frecuencia.totalCargas > 3) {
-                    alertas.push({ tipo: "frecuente", mensaje: `Carga cada ${frecuencia.promedioDias} días (frecuente)` });
-                    totalFrecuentes++;
-                }
-                
-                for (const alerta of alertas) {
-                    if (alerta.tipo === 'critico') totalCriticas++;
-                    else if (alerta.tipo === 'advertencia') totalAdvertencias++;
-                    else if (alerta.tipo === 'revision') totalRevision++;
-                }
-                
-                alertasPorVehiculo.push({
-                    placa: vehiculo.placa, marca: vehiculo.marca, modelo: vehiculo.modelo, tipo: vehiculo.tipoVehiculo || 'sedan',
-                    rendimientoActual: rendimientoActual.toFixed(2), rendimientoEsperado: esperado,
-                    estadoRendimiento: estadoRendimiento, diasUltimaCarga: diasUltimaCarga, alertas: alertas
-                });
-            }
-            
-            document.getElementById('totalCriticas').textContent = totalCriticas;
-            document.getElementById('totalAdvertencias').textContent = totalAdvertencias;
-            document.getElementById('totalRevision').textContent = totalRevision;
-            document.getElementById('totalFrecuentes').textContent = totalFrecuentes;
-            
-            const tbodyAlertas = document.getElementById('alertasTableBody');
-            if (tbodyAlertas) {
-                tbodyAlertas.innerHTML = '';
-                for (const item of alertasPorVehiculo) {
-                    const row = tbodyAlertas.insertRow();
-                    const alertasHtml = item.alertas.map(a => `<span class="inline-block px-2 py-1 text-xs rounded ${a.tipo === 'critico' ? 'bg-red-100 text-red-700' : a.tipo === 'advertencia' ? 'bg-yellow-100 text-yellow-700' : a.tipo === 'revision' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'} mr-1 mb-1">${a.mensaje}</span>`).join('');
-                    row.innerHTML = `<td class="py-2 px-3 font-semibold">${item.placa}</td><td class="py-2 px-3">${item.marca} ${item.modelo}</td><td class="py-2 px-3">${item.tipo}</td><td class="py-2 px-3 ${item.estadoRendimiento.clase}">${item.rendimientoActual} km/L</td><td class="py-2 px-3">${item.rendimientoEsperado} km/L</td><td class="py-2 px-3">${item.diasUltimaCarga !== null ? item.diasUltimaCarga + ' días' : 'Sin cargas'}</td><td class="py-2 px-3">${alertasHtml || '✅ Sin alertas'}</td>`;
-                }
-            }
-            
-            cargarHistorialCargas();
-        }
+        // ============ CONFIGURACIÓN DE FORMULARIOS ============
+        function setupAllForms() { setupVehicleForm(); setupMaintenanceForm(); setupInspectionForm(); setupFuelForm(); setupSiniestroForm(); setupLavadoForm(); setupGasoilForm(); }
 
         // VEHÍCULOS
         function setupVehicleForm() {
@@ -715,46 +778,34 @@
                 form.reset();
                 document.getElementById('vehicleId').value = '';
                 updatePlacasList();
-                cargarAnalisisCombustibleCompleto();
-                alert('✅ Vehículo guardado');
+                cargarAnalisisCombustible();
             });
-            
             document.getElementById('deleteMassiveBtn')?.addEventListener('click', async () => {
                 if(currentUser.role !== 'admin') return;
-                const confirmado = confirm('⚠️ ADVERTENCIA: Esta acción eliminará TODOS los vehículos. Los mantenimientos, inspecciones, combustibles y otros registros asociados QUEDARÁN HUÉRFANOS. ¿Está ABSOLUTAMENTE SEGURO?');
-                if(confirmado) {
-                    const dobleConfirm = confirm('ÚLTIMA ADVERTENCIA: Esta acción NO se puede deshacer. ¿Desea continuar?');
-                    if(dobleConfirm) {
-                        for(let v of vehicles) if(v.firebaseId) await deleteFromFirebase('vehicles', v.firebaseId);
-                        vehicles = [];
-                        localStorage.setItem('vehicles', JSON.stringify(vehicles));
-                        loadVehicleData();
-                        updatePlacasList();
-                        cargarAnalisisCombustibleCompleto();
-                        alert('✅ Todos los vehículos han sido eliminados');
-                    }
+                if(confirm('¿Eliminar TODOS los vehículos?')) {
+                    for(let v of vehicles) if(v.firebaseId) await deleteFromFirebase('vehicles', v.firebaseId);
+                    vehicles = [];
+                    localStorage.setItem('vehicles', JSON.stringify(vehicles));
+                    loadVehicleData();
+                    updatePlacasList();
+                    cargarAnalisisCombustible();
                 }
             });
         }
 
-        window.deleteVehicle = async (index) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar este vehículo?')) { if(vehicles[index]?.firebaseId) await deleteFromFirebase('vehicles', vehicles[index].firebaseId); vehicles.splice(index,1); localStorage.setItem('vehicles',JSON.stringify(vehicles)); loadVehicleData(); updatePlacasList(); cargarAnalisisCombustibleCompleto(); alert('✅ Vehículo eliminado'); } };
+        window.deleteVehicle = async (index) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar?')) { if(vehicles[index]?.firebaseId) await deleteFromFirebase('vehicles', vehicles[index].firebaseId); vehicles.splice(index,1); localStorage.setItem('vehicles',JSON.stringify(vehicles)); loadVehicleData(); updatePlacasList(); cargarAnalisisCombustible(); } };
         window.editVehicle = (index) => { if(currentUser.role !== 'admin') return; const v = vehicles[index]; document.getElementById('vehicleId').value = index; document.getElementById('placa').value = v.placa; document.getElementById('marca').value = v.marca; document.getElementById('modelo').value = v.modelo; document.getElementById('anio').value = v.anio; document.getElementById('tipoVehiculo').value = v.tipoVehiculo || 'sedan'; document.getElementById('centroOperaciones').value = v.centroOperaciones; document.getElementById('capacidadTanque').value = v.capacidadTanque||''; document.getElementById('kilometrajeActual').value = v.kilometrajeActual||0; document.getElementById('departamentoAsignado').value = v.departamentoAsignado||''; document.getElementById('estado').value = v.estado||''; };
 
         function loadVehicleData() {
             const tbody = document.getElementById('vehicleTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if (vehicles.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="9" class="text-center py-4 text-gray-500">No hay vehículos registrados. Use "Importar" o "Guardar Vehículo" para agregar.</td>';
-                return;
-            }
             vehicles.forEach((v,i) => {
                 const row = tbody.insertRow();
                 row.className = 'border-b hover:bg-gray-100';
                 const editClass = currentUser?.role === 'admin' ? 'bg-blue-500 text-white px-2 py-1 rounded text-xs' : 'hidden';
                 const deleteClass = currentUser?.role === 'admin' ? 'bg-red-500 text-white px-2 py-1 rounded text-xs' : 'hidden';
-                row.innerHTML = `<td class="py-2 px-3 font-semibold">${v.placa||''}</td><td class="py-2 px-3">${v.marca||''} ${v.modelo||''}</td><td class="py-2 px-3">${v.tipoVehiculo||'sedan'}</td><td class="py-2 px-3">${v.anio||''}</td><td class="py-2 px-3">${v.centroOperaciones||''}</td><td class="py-2 px-3">${(v.kilometrajeActual||0).toLocaleString()} km</td><td class="py-2 px-3">${v.capacidadTanque||'N/A'} L</td><td class="py-2 px-3">${v.estado||'N/A'}</td><td class="text-center"><div class="flex gap-1 justify-center"><button onclick="editVehicle(${i})" class="${editClass}">Editar</button><button onclick="deleteVehicle(${i})" class="${deleteClass}">Eliminar</button></div></td>`;
+                row.innerHTML = `<td class="py-2 px-3 font-semibold">${v.placa||''}</td><td class="py-2 px-3">${v.marca||''} ${v.modelo||''}</td><td class="py-2 px-3">${v.tipoVehiculo||'sedan'}</td><td class="py-2 px-3">${v.anio||''}</td><td class="py-2 px-3">${v.centroOperaciones||''}</td><td class="py-2 px-3">${v.kilometrajeActual||0} km</td><td class="py-2 px-3">${v.capacidadTanque||'N/A'} L</td><td class="py-2 px-3">${v.estado||'N/A'}</td><td class="text-center"><div class="flex gap-1 justify-center"><button onclick="editVehicle(${i})" class="${editClass}">Editar</button><button onclick="deleteVehicle(${i})" class="${deleteClass}">Eliminar</button></div></td>`;
             });
             updatePlacasList();
         }
@@ -786,10 +837,7 @@
                 loadMaintenanceData();
                 form.reset();
                 document.getElementById('maintenanceId').value = '';
-                document.getElementById('camposPreventivo').classList.add('hidden');
-                document.getElementById('camposCorrectivo').classList.add('hidden');
                 updateReports(); updateTotalPendienteHeader();
-                alert('✅ Mantenimiento guardado');
             });
             document.getElementById('tipoMantenimiento')?.addEventListener('change', function() {
                 const isPreventivo = this.value === 'preventivo';
@@ -803,18 +851,13 @@
         }
 
         window.toggleEstadoPagoMantenimiento = async (index) => { if(currentUser.role !== 'admin') return; const nuevo = maintenances[index].estadoPago === 'pagado' ? 'pendiente' : 'pagado'; if(confirm(`¿Cambiar a ${nuevo}?`)) { if(maintenances[index]?.firebaseId) await updateInFirebase('maintenances', maintenances[index].firebaseId, {...maintenances[index], estadoPago: nuevo}); maintenances[index].estadoPago = nuevo; localStorage.setItem('maintenances', JSON.stringify(maintenances)); loadMaintenanceData(); updateReports(); updateTotalPendienteHeader(); } };
-        window.deleteMaintenance = async (index) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar este mantenimiento?')) { if(maintenances[index]?.firebaseId) await deleteFromFirebase('maintenances', maintenances[index].firebaseId); maintenances.splice(index,1); localStorage.setItem('maintenances', JSON.stringify(maintenances)); loadMaintenanceData(); updateReports(); updateTotalPendienteHeader(); alert('✅ Mantenimiento eliminado'); } };
+        window.deleteMaintenance = async (index) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar?')) { if(maintenances[index]?.firebaseId) await deleteFromFirebase('maintenances', maintenances[index].firebaseId); maintenances.splice(index,1); localStorage.setItem('maintenances', JSON.stringify(maintenances)); loadMaintenanceData(); updateReports(); updateTotalPendienteHeader(); } };
         window.editMaintenance = (index) => { if(currentUser.role !== 'admin') return; const m = maintenances[index]; document.getElementById('maintenanceId').value = index; document.getElementById('placaMantenimiento').value = m.placa; document.getElementById('tipoMantenimiento').value = m.tipo; document.getElementById('fechaMantenimiento').value = m.fecha; document.getElementById('costoMantenimiento').value = m.costo; document.getElementById('proveedorTaller').value = m.proveedor; document.getElementById('centroMantenimiento').value = m.centro; document.getElementById('estadoPagoMantenimiento').value = m.estadoPago||'pendiente'; document.getElementById('tipoMantenimiento').dispatchEvent(new Event('change')); if(m.tipo === 'preventivo') { document.getElementById('kilometrajePreventivo').value = m.kilometraje||''; document.getElementById('descripcionPreventivo').value = m.descripcion||''; } else { document.getElementById('descripcionCorrectivo').value = m.descripcion||''; document.getElementById('causaCorrectivo').value = m.causa||''; } };
 
         function loadMaintenanceData() {
             const tbody = document.getElementById('maintenanceTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if (maintenances.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="9" class="text-center py-4 text-gray-500">No hay registros de mantenimientos</td>';
-                return;
-            }
             let data = ordenarPorFecha(maintenances);
             if(mostrarSoloPendientes.mantenimientos) data = data.filter(m => m.estadoPago === 'pendiente');
             data.forEach((m, idx) => {
@@ -828,21 +871,17 @@
             });
         }
 
-        // INSPECCIÓN
+        // INSPECCIÓN (CON HORA DE VENEZUELA)
         function setupInspectionForm() {
             const form = document.getElementById('inspectionForm');
             if(!form) return;
-            const horaInput = document.getElementById('horaInspeccion');
-            if (horaInput && !horaInput.value) {
-                horaInput.value = getHoraVenezuela();
-            }
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const btn = document.getElementById('guardarInspeccionBtn');
                 if(btn.disabled) return;
                 btn.disabled = true;
                 const original = btn.innerHTML;
-                btn.innerHTML = '<span class="loading-spinner"></span> Guardando...';
+                btn.innerHTML = '⏳ Guardando...';
                 try {
                     const id = document.getElementById('inspectionId').value;
                     const chequeo = {};
@@ -864,23 +903,18 @@
                     document.getElementById('inspectionId').value = '';
                     document.getElementById('horaInspeccion').value = getHoraVenezuela();
                     alert('✅ Inspección guardada');
-                } catch(e) { console.error(e); alert('❌ Error al guardar'); }
+                } catch(e) { alert('❌ Error'); }
                 finally { setTimeout(() => { btn.disabled = false; btn.innerHTML = original; }, 2000); }
             });
         }
 
         window.editInspection = (index) => { if(currentUser?.role !== 'admin') return; const insp = inspections[index]; document.getElementById('inspectionId').value = index; document.getElementById('placaInspeccion').value = insp.placa; document.getElementById('conductorInspeccion').value = insp.conductor; document.getElementById('kilometrajeInspeccion').value = insp.kilometraje; document.getElementById('fechaInspeccion').value = insp.fecha; document.getElementById('horaInspeccion').value = insp.hora || getHoraVenezuela(); document.getElementById('observacionesInspeccion').value = insp.observaciones||''; document.querySelectorAll('#inspectionForm input[type="checkbox"]').forEach(cb => { cb.checked = insp.chequeo && insp.chequeo[cb.name] === 'ok'; }); };
-        window.deleteInspection = async (index) => { if(currentUser?.role !== 'admin') return; if(confirm('¿Eliminar esta inspección?')) { if(inspections[index]?.firebaseId) await deleteFromFirebase('inspections', inspections[index].firebaseId); inspections.splice(index,1); localStorage.setItem('inspections', JSON.stringify(inspections)); loadInspectionData(); alert('✅ Inspección eliminada'); } };
+        window.deleteInspection = async (index) => { if(currentUser?.role !== 'admin') return; if(confirm('¿Eliminar?')) { if(inspections[index]?.firebaseId) await deleteFromFirebase('inspections', inspections[index].firebaseId); inspections.splice(index,1); localStorage.setItem('inspections', JSON.stringify(inspections)); loadInspectionData(); } };
 
         function loadInspectionData() {
             const tbody = document.getElementById('inspectionTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if (inspections.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="7" class="text-center py-4 text-gray-500">No hay inspecciones registradas</td>';
-                return;
-            }
             ordenarPorFecha(inspections).forEach((insp, idx) => {
                 const origIdx = inspections.findIndex(i => i.placa === insp.placa && i.fecha === insp.fecha && i.conductor === insp.conductor);
                 const items = [];
@@ -888,7 +922,7 @@
                 const row = tbody.insertRow();
                 const editClass = currentUser?.role === 'admin' ? 'bg-blue-500 text-white px-1 py-0.5 rounded text-xs' : 'hidden';
                 const deleteClass = currentUser?.role === 'admin' ? 'bg-red-500 text-white px-1 py-0.5 rounded text-xs' : 'hidden';
-                row.innerHTML = `<td class="py-2 px-3">${insp.placa}</td><td class="py-2 px-3">${insp.conductor}</td><td class="py-2 px-3">${insp.kilometraje} km</td><td class="py-2 px-3">${formatearFechaHora(insp.fecha, insp.hora)}</td><td class="text-xs">${items.join(', ').substring(0,50)}...</td><td class="text-xs">${(insp.observaciones||'').substring(0,50)}</td><td class="text-center"><div class="flex gap-1"><button onclick="editInspection(${origIdx})" class="${editClass}">Editar</button><button onclick="deleteInspection(${origIdx})" class="${deleteClass}">Eliminar</button></div></td>`;
+                row.innerHTML = `<td class="py-2 px-3">${insp.placa}</td><td class="py-2 px-3">${insp.conductor}</td><td class="py-2 px-3">${insp.kilometraje}</td><td class="py-2 px-3">${formatearFechaHora(insp.fecha, insp.hora)}</td><td class="text-xs">${items.join(', ').substring(0,50)}...</td><td class="text-xs">${(insp.observaciones||'').substring(0,50)}</td><td class="text-center"><div class="flex gap-1"><button onclick="editInspection(${origIdx})" class="${editClass}">Editar</button><button onclick="deleteInspection(${origIdx})" class="${deleteClass}">Eliminar</button></div></td>`;
             });
         }
 
@@ -903,24 +937,8 @@
                 const id = document.getElementById('fuelId').value;
                 const litros = parseFloat(document.getElementById('litros').value)||0;
                 const kilometraje = parseFloat(document.getElementById('kilometrajeRegistro').value)||0;
-                const placa = document.getElementById('placaCombustible').value.toUpperCase();
-                
-                const vehiculo = vehicles.find(v => v.placa === placa);
-                if (vehiculo && kilometraje < (vehiculo.kilometrajeActual || 0)) {
-                    if (!confirm(`⚠️ El kilometraje ingresado (${kilometraje} km) es MENOR al kilometraje actual del vehículo (${vehiculo.kilometrajeActual} km). ¿Desea continuar de todas formas?`)) {
-                        return;
-                    }
-                }
-                
-                const ultimaCarga = fuelRecords.filter(f => f.placa === placa).sort((a,b) => new Date(b.fecha) - new Date(a.fecha))[0];
-                if (ultimaCarga && kilometraje <= ultimaCarga.kilometraje && ultimaCarga.kilometraje) {
-                    if (!confirm(`⚠️ El kilometraje (${kilometraje} km) es menor o igual al último registro (${ultimaCarga.kilometraje} km). ¿Desea continuar?`)) {
-                        return;
-                    }
-                }
-                
                 const fuel = { 
-                    placa: placa, 
+                    placa: document.getElementById('placaCombustible').value.toUpperCase(), 
                     fecha: document.getElementById('fechaCombustible').value, 
                     kilometraje: kilometraje,
                     litros: litros, 
@@ -929,12 +947,12 @@
                     estadoPago: document.getElementById('estadoPagoCombustible').value 
                 };
                 
+                const vehiculo = vehicles.find(v => v.placa === fuel.placa);
                 if (vehiculo && kilometraje > (vehiculo.kilometrajeActual || 0)) {
                     vehiculo.kilometrajeActual = kilometraje;
                     if (vehiculo.firebaseId) await updateInFirebase('vehicles', vehiculo.firebaseId, vehiculo);
-                    localStorage.setItem('vehicles', JSON.stringify(vehicles));
-                    loadVehicleData();
                 }
+                localStorage.setItem('vehicles', JSON.stringify(vehicles));
                 
                 if(id === '') { const fbId = await saveToFirebase('fuelRecords', fuel); if(fbId) fuel.firebaseId = fbId; fuelRecords.push(fuel); }
                 else { if(fuelRecords[id]?.firebaseId) await updateInFirebase('fuelRecords', fuelRecords[id].firebaseId, fuel); fuelRecords[id] = fuel; }
@@ -942,27 +960,20 @@
                 loadFuelData();
                 form.reset();
                 document.getElementById('fuelId').value = '';
-                document.getElementById('costoCombustible').value = '';
                 updateReports(); updateTotalPendienteHeader();
-                cargarAnalisisCombustibleCompleto();
-                alert('✅ Carga de combustible guardada');
+                cargarAnalisisCombustible();
             });
             document.getElementById('togglePendientesCombustible')?.addEventListener('click', () => { mostrarSoloPendientes.combustible = !mostrarSoloPendientes.combustible; loadFuelData(); });
         }
 
-        window.toggleEstadoPagoCombustible = async (index) => { if(currentUser.role !== 'admin') return; const nuevo = fuelRecords[index].estadoPago === 'pagado' ? 'pendiente' : 'pagado'; if(confirm(`¿Cambiar a ${nuevo}?`)) { if(fuelRecords[index]?.firebaseId) await updateInFirebase('fuelRecords', fuelRecords[index].firebaseId, {...fuelRecords[index], estadoPago: nuevo}); fuelRecords[index].estadoPago = nuevo; localStorage.setItem('fuelRecords', JSON.stringify(fuelRecords)); loadFuelData(); updateReports(); updateTotalPendienteHeader(); cargarAnalisisCombustibleCompleto(); } };
-        window.deleteFuel = async (index) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar este registro?')) { if(fuelRecords[index]?.firebaseId) await deleteFromFirebase('fuelRecords', fuelRecords[index].firebaseId); fuelRecords.splice(index,1); localStorage.setItem('fuelRecords', JSON.stringify(fuelRecords)); loadFuelData(); updateReports(); updateTotalPendienteHeader(); cargarAnalisisCombustibleCompleto(); } };
+        window.toggleEstadoPagoCombustible = async (index) => { if(currentUser.role !== 'admin') return; const nuevo = fuelRecords[index].estadoPago === 'pagado' ? 'pendiente' : 'pagado'; if(confirm(`¿Cambiar a ${nuevo}?`)) { if(fuelRecords[index]?.firebaseId) await updateInFirebase('fuelRecords', fuelRecords[index].firebaseId, {...fuelRecords[index], estadoPago: nuevo}); fuelRecords[index].estadoPago = nuevo; localStorage.setItem('fuelRecords', JSON.stringify(fuelRecords)); loadFuelData(); updateReports(); updateTotalPendienteHeader(); cargarAnalisisCombustible(); } };
+        window.deleteFuel = async (index) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar?')) { if(fuelRecords[index]?.firebaseId) await deleteFromFirebase('fuelRecords', fuelRecords[index].firebaseId); fuelRecords.splice(index,1); localStorage.setItem('fuelRecords', JSON.stringify(fuelRecords)); loadFuelData(); updateReports(); updateTotalPendienteHeader(); cargarAnalisisCombustible(); } };
         window.editFuel = (index) => { if(currentUser.role !== 'admin') return; const f = fuelRecords[index]; document.getElementById('fuelId').value = index; document.getElementById('placaCombustible').value = f.placa; document.getElementById('fechaCombustible').value = f.fecha; document.getElementById('kilometrajeRegistro').value = f.kilometraje; document.getElementById('litros').value = f.litros; document.getElementById('costoCombustible').value = f.costo; document.getElementById('centroCombustible').value = f.centro; document.getElementById('estadoPagoCombustible').value = f.estadoPago||'pendiente'; };
 
         function loadFuelData() {
             const tbody = document.getElementById('fuelTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if (fuelRecords.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="9" class="text-center py-4 text-gray-500">No hay registros de combustible</td>';
-                return;
-            }
             let data = ordenarPorFecha(fuelRecords);
             if(mostrarSoloPendientes.combustible) data = data.filter(f => f.estadoPago === 'pendiente');
             data.forEach((f, idx) => {
@@ -973,9 +984,9 @@
                 const deleteClass = currentUser?.role === 'admin' ? 'bg-red-500 text-white px-1 py-0.5 rounded text-xs' : 'hidden';
                 
                 let rendimiento = '';
-                const cargaAnterior = fuelRecords.filter(fr => fr.placa === f.placa && new Date(fr.fecha) < new Date(f.fecha)).sort((a,b) => new Date(b.fecha) - new Date(a.fecha))[0];
-                if (cargaAnterior && f.kilometraje && cargaAnterior.kilometraje) {
-                    const kmRecorridos = f.kilometraje - cargaAnterior.kilometraje;
+                const siguienteCarga = fuelRecords.find(fr => fr.placa === f.placa && new Date(fr.fecha) > new Date(f.fecha));
+                if (siguienteCarga && f.kilometraje && siguienteCarga.kilometraje) {
+                    const kmRecorridos = siguienteCarga.kilometraje - f.kilometraje;
                     if (kmRecorridos > 0 && kmRecorridos < 5000 && f.litros > 0) {
                         rendimiento = (kmRecorridos / f.litros).toFixed(2) + ' km/L';
                     } else { rendimiento = 'Pendiente'; }
@@ -985,7 +996,7 @@
             });
         }
 
-        // SINIESTROS
+        // SINIESTROS, LAVADO, GASOIL - Funciones abreviadas pero completas
         function setupSiniestroForm() {
             const form = document.getElementById('siniestroForm');
             if(!form) return;
@@ -1001,7 +1012,6 @@
                 form.reset();
                 document.getElementById('siniestroId').value = '';
                 updateReports();
-                alert('✅ Siniestro guardado');
             });
         }
 
@@ -1009,11 +1019,6 @@
             const tbody = document.getElementById('siniestroTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if (siniestros.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="9" class="text-center py-4 text-gray-500">No hay registros de siniestros</td>';
-                return;
-            }
             ordenarPorFecha(siniestros, 'fechaHora').forEach((s,i) => {
                 const row = tbody.insertRow();
                 const editClass = currentUser?.role === 'admin' ? 'bg-blue-500 text-white px-1 py-0.5 rounded text-xs' : 'hidden';
@@ -1023,9 +1028,8 @@
         }
         
         window.editSiniestro = (i) => { if(currentUser.role !== 'admin') return; const s = siniestros[i]; document.getElementById('siniestroId').value = i; document.getElementById('placaSiniestro').value = s.placa; document.getElementById('fechaHoraSiniestro').value = s.fechaHora; document.getElementById('conductorSiniestro').value = s.conductor; document.getElementById('polizaSiniestro').value = s.poliza; document.getElementById('lugarSiniestro').value = s.lugar; document.getElementById('descripcionSiniestro').value = s.descripcion; document.getElementById('costoReparacion').value = s.costoReparacion; document.getElementById('centroSiniestro').value = s.centro; };
-        window.deleteSiniestro = async (i) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar este siniestro?')) { if(siniestros[i]?.firebaseId) await deleteFromFirebase('siniestros', siniestros[i].firebaseId); siniestros.splice(i,1); localStorage.setItem('siniestros', JSON.stringify(siniestros)); loadSiniestroData(); updateReports(); alert('✅ Siniestro eliminado'); } };
+        window.deleteSiniestro = async (i) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar?')) { if(siniestros[i]?.firebaseId) await deleteFromFirebase('siniestros', siniestros[i].firebaseId); siniestros.splice(i,1); localStorage.setItem('siniestros', JSON.stringify(siniestros)); loadSiniestroData(); updateReports(); } };
 
-        // LAVADO
         function setupLavadoForm() {
             const form = document.getElementById('lavadoForm');
             if(!form) return;
@@ -1041,7 +1045,6 @@
                 form.reset();
                 document.getElementById('lavadoId').value = '';
                 updateReports(); updateTotalPendienteHeader();
-                alert('✅ Lavado guardado');
             });
             document.getElementById('togglePendientesLavado')?.addEventListener('click', () => { mostrarSoloPendientes.lavados = !mostrarSoloPendientes.lavados; loadLavadoData(); });
         }
@@ -1050,11 +1053,6 @@
             const tbody = document.getElementById('lavadoTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if (lavados.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="6" class="text-center py-4 text-gray-500">No hay registros de lavado</td>';
-                return;
-            }
             let data = ordenarPorFecha(lavados);
             if(mostrarSoloPendientes.lavados) data = data.filter(l => l.estadoPago === 'pendiente');
             data.forEach((l, idx) => {
@@ -1069,9 +1067,8 @@
         
         window.editLavado = (i) => { if(currentUser.role !== 'admin') return; const l = lavados[i]; document.getElementById('lavadoId').value = i; document.getElementById('placaLavado').value = l.placa; document.getElementById('fechaLavado').value = l.fecha; document.getElementById('costoLavado').value = l.costo; document.getElementById('centroLavado').value = l.centro; document.getElementById('estadoPagoLavado').value = l.estadoPago||'pendiente'; };
         window.toggleEstadoPagoLavado = async (i) => { if(currentUser.role !== 'admin') return; const nuevo = lavados[i].estadoPago === 'pagado' ? 'pendiente' : 'pagado'; if(confirm(`¿Cambiar a ${nuevo}?`)) { if(lavados[i]?.firebaseId) await updateInFirebase('lavados', lavados[i].firebaseId, {...lavados[i], estadoPago: nuevo}); lavados[i].estadoPago = nuevo; localStorage.setItem('lavados', JSON.stringify(lavados)); loadLavadoData(); updateReports(); updateTotalPendienteHeader(); } };
-        window.deleteLavado = async (i) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar este lavado?')) { if(lavados[i]?.firebaseId) await deleteFromFirebase('lavados', lavados[i].firebaseId); lavados.splice(i,1); localStorage.setItem('lavados', JSON.stringify(lavados)); loadLavadoData(); updateReports(); updateTotalPendienteHeader(); alert('✅ Lavado eliminado'); } };
+        window.deleteLavado = async (i) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar?')) { if(lavados[i]?.firebaseId) await deleteFromFirebase('lavados', lavados[i].firebaseId); lavados.splice(i,1); localStorage.setItem('lavados', JSON.stringify(lavados)); loadLavadoData(); updateReports(); updateTotalPendienteHeader(); } };
 
-        // GASOIL
         function setupGasoilForm() {
             const form = document.getElementById('gasoilForm');
             if(!form) return;
@@ -1092,7 +1089,6 @@
                 form.reset();
                 document.getElementById('gasoilId').value = '';
                 updateReports(); updateTotalPendienteHeader();
-                alert('✅ Gasoil guardado');
             });
             document.getElementById('togglePendientesGasoil')?.addEventListener('click', () => { mostrarSoloPendientes.gasoil = !mostrarSoloPendientes.gasoil; loadGasoilData(); });
         }
@@ -1101,11 +1097,6 @@
             const tbody = document.getElementById('gasoilTableBody');
             if(!tbody) return;
             tbody.innerHTML = '';
-            if (gasoilRecords.length === 0) {
-                const row = tbody.insertRow();
-                row.innerHTML = '<td colspan="8" class="text-center py-4 text-gray-500">No hay registros de gasoil</td>';
-                return;
-            }
             let data = ordenarPorFecha(gasoilRecords);
             if(mostrarSoloPendientes.gasoil) data = data.filter(g => g.estadoPago === 'pendiente');
             data.forEach((g, idx) => {
@@ -1120,9 +1111,9 @@
         
         window.editGasoil = (i) => { if(currentUser.role !== 'admin') return; const g = gasoilRecords[i]; document.getElementById('gasoilId').value = i; document.getElementById('placaGasoil').value = g.placa; document.getElementById('fechaGasoil').value = g.fecha; document.getElementById('litrosGasoil').value = g.litros; document.getElementById('fleteGasoil').value = g.flete; document.getElementById('costoGasoil').value = g.costo; document.getElementById('centroGasoil').value = g.centro; document.getElementById('estadoPagoGasoil').value = g.estadoPago||'pendiente'; };
         window.toggleEstadoPagoGasoil = async (i) => { if(currentUser.role !== 'admin') return; const nuevo = gasoilRecords[i].estadoPago === 'pagado' ? 'pendiente' : 'pagado'; if(confirm(`¿Cambiar a ${nuevo}?`)) { if(gasoilRecords[i]?.firebaseId) await updateInFirebase('gasoilRecords', gasoilRecords[i].firebaseId, {...gasoilRecords[i], estadoPago: nuevo}); gasoilRecords[i].estadoPago = nuevo; localStorage.setItem('gasoilRecords', JSON.stringify(gasoilRecords)); loadGasoilData(); updateReports(); updateTotalPendienteHeader(); } };
-        window.deleteGasoil = async (i) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar este registro de gasoil?')) { if(gasoilRecords[i]?.firebaseId) await deleteFromFirebase('gasoilRecords', gasoilRecords[i].firebaseId); gasoilRecords.splice(i,1); localStorage.setItem('gasoilRecords', JSON.stringify(gasoilRecords)); loadGasoilData(); updateReports(); updateTotalPendienteHeader(); alert('✅ Registro de gasoil eliminado'); } };
+        window.deleteGasoil = async (i) => { if(currentUser.role !== 'admin') return; if(confirm('¿Eliminar?')) { if(gasoilRecords[i]?.firebaseId) await deleteFromFirebase('gasoilRecords', gasoilRecords[i].firebaseId); gasoilRecords.splice(i,1); localStorage.setItem('gasoilRecords', JSON.stringify(gasoilRecords)); loadGasoilData(); updateReports(); updateTotalPendienteHeader(); } };
 
-        // REPORTES
+        // REPORTES Y ESTADÍSTICAS
         function setupYearSelector() {
             const yearSelect = document.getElementById('reportYear');
             if(!yearSelect) return;
@@ -1202,10 +1193,10 @@
             const ctx = document.getElementById('monthlyComparisonChart');
             if(!ctx) return;
             const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-            const msoData = [], losTequesData = [];
-            for(let m=1; m<=12; m++) { msoData.push(calculateTotalExpenses('MSO', year, m, mostrarSoloPendientesReporte)); losTequesData.push(calculateTotalExpenses('U.N Los Teques', year, m, mostrarSoloPendientesReporte)); }
+            const msoData = [], guarenasData = [];
+            for(let m=1; m<=12; m++) { msoData.push(calculateTotalExpenses('MSO', year, m, mostrarSoloPendientesReporte)); guarenasData.push(calculateTotalExpenses('U.N Los Teques', year, m, mostrarSoloPendientesReporte)); }
             if(monthlyComparisonChart) monthlyComparisonChart.destroy();
-            monthlyComparisonChart = new Chart(ctx, { type: 'line', data: { labels: months, datasets: [{ label: 'MSO', data: msoData, borderColor: '#005BAA', tension: 0.1 }, { label: 'U.N Los Teques', data: losTequesData, borderColor: '#FDD000', tension: 0.1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': $' + ctx.raw.toFixed(2) } } }, scales: { y: { beginAtZero: true, ticks: { callback: (v) => '$' + v.toFixed(0) } } } } });
+            monthlyComparisonChart = new Chart(ctx, { type: 'line', data: { labels: months, datasets: [{ label: 'MSO', data: msoData, borderColor: '#005BAA', tension: 0.1 }, { label: 'U.N Los Teques', data: guarenasData, borderColor: '#FDD000', tension: 0.1 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': $' + ctx.raw.toFixed(2) } } }, scales: { y: { beginAtZero: true, ticks: { callback: (v) => '$' + v.toFixed(0) } } } } });
         }
 
         function updateExpenseDistributionChart(year, center) {
@@ -1214,70 +1205,6 @@
             const data = [calculateCategoryExpenses('maintenances', year, center, mostrarSoloPendientesReporte), calculateCategoryExpenses('fuel', year, center, mostrarSoloPendientesReporte), calculateCategoryExpenses('siniestros', year, center, false), calculateCategoryExpenses('lavados', year, center, mostrarSoloPendientesReporte), calculateCategoryExpenses('gasoil', year, center, mostrarSoloPendientesReporte)];
             if(expenseDistributionChart) expenseDistributionChart.destroy();
             expenseDistributionChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['Mantenimientos','Combustible','Siniestros','Lavados','Gasoil'], datasets: [{ data: data, backgroundColor: ['#005BAA','#5CE1E6','#FDD000','#10b981','#8b5cf6'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (ctx) => { const total = ctx.dataset.data.reduce((a,b)=>a+b,0); const pct = total>0 ? ((ctx.raw/total)*100).toFixed(1) : 0; return ctx.label + ': $' + ctx.raw.toFixed(2) + ' (' + pct + '%)'; } } } } } });
-        }
-
-        // REPORTE PDF
-        function calcularEstadisticasMensuales(mes, anio) {
-            const stats = { 'U.N Los Teques': { mantenimientos: { preventivos:0, correctivos:0, total:0 }, lavados:{ cantidad:0, total:0 }, gasolina:{ litros:0, total:0 }, gasoil:{ litros:0, flete:0, total:0 } }, 'MSO': { mantenimientos: { preventivos:0, correctivos:0, total:0 }, lavados:{ cantidad:0, total:0 }, gasolina:{ litros:0, total:0 }, gasoil:{ litros:0, flete:0, total:0 } } };
-            maintenances.forEach(m => { if(stats[m.centro]) { const f = new Date(m.fecha); if(f.getMonth()+1 == mes && f.getFullYear() == anio) { stats[m.centro].mantenimientos.total += parseFloat(m.costo||0); if(m.tipo === 'preventivo') stats[m.centro].mantenimientos.preventivos++; else if(m.tipo === 'correctivo') stats[m.centro].mantenimientos.correctivos++; } } });
-            lavados.forEach(l => { if(stats[l.centro]) { const f = new Date(l.fecha); if(f.getMonth()+1 == mes && f.getFullYear() == anio) { stats[l.centro].lavados.cantidad++; stats[l.centro].lavados.total += parseFloat(l.costo||0); } } });
-            fuelRecords.forEach(f => { if(stats[f.centro]) { const fd = new Date(f.fecha); if(fd.getMonth()+1 == mes && fd.getFullYear() == anio) { stats[f.centro].gasolina.litros += parseFloat(f.litros||0); stats[f.centro].gasolina.total += parseFloat(f.costo||0); } } });
-            gasoilRecords.forEach(g => { if(stats[g.centro]) { const fd = new Date(g.fecha); if(fd.getMonth()+1 == mes && fd.getFullYear() == anio) { stats[g.centro].gasoil.litros += parseFloat(g.litros||0); stats[g.centro].gasoil.flete += parseFloat(g.flete||0); stats[g.centro].gasoil.total += parseFloat(g.costo||0); } } });
-            return stats;
-        }
-
-        function generarHTMLReporteMensual(mes, anio) {
-            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-            const stats = calcularEstadisticasMensuales(mes, anio);
-            const totalMant = stats['U.N Los Teques'].mantenimientos.total + stats['MSO'].mantenimientos.total;
-            const totalLav = stats['U.N Los Teques'].lavados.total + stats['MSO'].lavados.total;
-            const totalGas = stats['U.N Los Teques'].gasolina.total + stats['MSO'].gasolina.total;
-            const totalGasoil = stats['U.N Los Teques'].gasoil.total + stats['MSO'].gasoil.total;
-            const totalLosTeques = stats['U.N Los Teques'].mantenimientos.total + stats['U.N Los Teques'].lavados.total + stats['U.N Los Teques'].gasolina.total + stats['U.N Los Teques'].gasoil.total;
-            const totalMSO = stats['MSO'].mantenimientos.total + stats['MSO'].lavados.total + stats['MSO'].gasolina.total + stats['MSO'].gasoil.total;
-            const fecha = new Date().toLocaleString('es-ES');
-            return `<div style="font-family:Arial;max-width:1200px;margin:0 auto;background:white;padding:30px"><h1 style="color:#005BAA;text-align:center;border-bottom:3px solid #005BAA;padding-bottom:15px">RELACIÓN DE GASTOS FLOTA - ${meses[mes-1].toUpperCase()} ${anio}</h1><table style="width:100%;border-collapse:collapse;border:2px solid #000;margin-bottom:40px"><thead><tr style="background:#e5e7eb"><th style="border:1px solid #000;padding:12px">CENTRO</th><th style="border:1px solid #000;padding:12px">MANTENIMIENTOS</th><th style="border:1px solid #000;padding:12px">LAVADO</th><th style="border:1px solid #000;padding:12px">GASOLINA</th><th style="border:1px solid #000;padding:12px">GASOIL</th> </thead><tbody><tr><td style="border:1px solid #000;padding:10px;font-weight:bold">U.N Los Teques</td><td style="border:1px solid #000;padding:10px">Preventivos: ${stats['U.N Los Teques'].mantenimientos.preventivos}<br>Correctivos: ${stats['U.N Los Teques'].mantenimientos.correctivos}<br><strong>TOTAL: $${stats['U.N Los Teques'].mantenimientos.total.toFixed(2)}</strong></td><td style="border:1px solid #000;padding:10px">Vehículos: ${stats['U.N Los Teques'].lavados.cantidad}<br><strong>TOTAL: $${stats['U.N Los Teques'].lavados.total.toFixed(2)}</strong></td><td style="border:1px solid #000;padding:10px">Litros: ${stats['U.N Los Teques'].gasolina.litros.toFixed(2)} L<br><strong>TOTAL: $${stats['U.N Los Teques'].gasolina.total.toFixed(2)}</strong></td><td style="border:1px solid #000;padding:10px">Litros: ${stats['U.N Los Teques'].gasoil.litros.toFixed(2)} L<br>Flete: $${stats['U.N Los Teques'].gasoil.flete.toFixed(2)}<br><strong>TOTAL: $${stats['U.N Los Teques'].gasoil.total.toFixed(2)}</strong></td> </tr><tr><td style="border:1px solid #000;padding:10px;font-weight:bold">MSO</td><td style="border:1px solid #000;padding:10px">Preventivos: ${stats['MSO'].mantenimientos.preventivos}<br>Correctivos: ${stats['MSO'].mantenimientos.correctivos}<br><strong>TOTAL: $${stats['MSO'].mantenimientos.total.toFixed(2)}</strong></td><td style="border:1px solid #000;padding:10px">Vehículos: ${stats['MSO'].lavados.cantidad}<br><strong>TOTAL: $${stats['MSO'].lavados.total.toFixed(2)}</strong></td><td style="border:1px solid #000;padding:10px">Litros: ${stats['MSO'].gasolina.litros.toFixed(2)} L<br><strong>TOTAL: $${stats['MSO'].gasolina.total.toFixed(2)}</strong></td><td style="border:1px solid #000;padding:10px">Litros: ${stats['MSO'].gasoil.litros.toFixed(2)} L<br>Flete: $${stats['MSO'].gasoil.flete.toFixed(2)}<br><strong>TOTAL: $${stats['MSO'].gasoil.total.toFixed(2)}</strong></td> </tr><tr style="background:#e5e7eb;font-weight:bold"><td style="border:1px solid #000;padding:10px;text-align:right">TOTALES</td><td style="border:1px solid #000;padding:10px">$${totalMant.toFixed(2)}</td><td style="border:1px solid #000;padding:10px">$${totalLav.toFixed(2)}</td><td style="border:1px solid #000;padding:10px">$${totalGas.toFixed(2)}</td><td style="border:1px solid #000;padding:10px">$${totalGasoil.toFixed(2)}</td> </tr></tbody></table><div><h2 style="color:#005BAA">RESUMEN POR CENTRO</h2><table style="width:70%;border-collapse:collapse;border:2px solid #000;margin:0 auto"><tr style="background:#e5e7eb"><th style="border:1px solid #000;padding:12px">CENTRO</th><th style="border:1px solid #000;padding:12px">TOTAL</th> </tr><tr><td style="border:1px solid #000;padding:10px;font-weight:bold">U.N Los Teques</td><td style="border:1px solid #000;padding:10px;text-align:right;color:#005BAA">$${totalLosTeques.toFixed(2)}</td> </tr><tr><td style="border:1px solid #000;padding:10px;font-weight:bold">MSO</td><td style="border:1px solid #000;padding:10px;text-align:right;color:#005BAA">$${totalMSO.toFixed(2)}</td> </tr><tr style="background:#f0f0f0;font-weight:bold"><td style="border:1px solid #000;padding:10px">TOTAL GENERAL</td><td style="border:1px solid #000;padding:10px;text-align:right;color:#005BAA">$${(totalLosTeques+totalMSO).toFixed(2)}</td> </tr></table></div><div style="margin-top:50px;text-align:right;font-size:11px;color:#666;border-top:1px solid #ccc;padding-top:20px"><p>📅 Generado: ${fecha}</p><p>Sistema de Gestión de Flota U.N Los Teques</p></div></div>`;
-        }
-
-        function actualizarVistaPreviaReporte() {
-            if(!currentUser || currentUser.role !== 'admin') return;
-            const mes = document.getElementById('reporteMes')?.value || new Date().getMonth()+1;
-            const anio = document.getElementById('reporteAnio')?.value || new Date().getFullYear();
-            const contenedor = document.getElementById('contenidoReporteMensual');
-            if(contenedor) contenedor.innerHTML = generarHTMLReporteMensual(parseInt(mes), parseInt(anio));
-        }
-
-        async function generarPDFReporteMensual() {
-            const mes = document.getElementById('reporteMes')?.value || '1';
-            const anio = document.getElementById('reporteAnio')?.value || new Date().getFullYear();
-            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-            const temp = document.createElement('div');
-            temp.style.position = 'absolute'; temp.style.left = '-9999px'; temp.style.width = '1200px'; temp.style.background = 'white'; temp.style.padding = '40px';
-            temp.innerHTML = generarHTMLReporteMensual(parseInt(mes), parseInt(anio));
-            document.body.appendChild(temp);
-            try {
-                const canvas = await html2canvas(temp, { scale: 1.2, backgroundColor: '#ffffff' });
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: 'a4' });
-                const imgData = canvas.toDataURL('image/png');
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const imgWidth = pageWidth - 30;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                doc.addImage(imgData, 'PNG', (pageWidth - imgWidth)/2, 15, imgWidth, imgHeight);
-                doc.save(`Gastos_Flota_${meses[parseInt(mes)-1]}_${anio}.pdf`);
-                alert('✅ PDF generado correctamente');
-            } catch(e) { console.error(e); alert('❌ Error al generar PDF'); }
-            finally { document.body.removeChild(temp); }
-        }
-
-        function setupReporteMensualPDFListeners() {
-            if(!currentUser || currentUser.role !== 'admin') return;
-            setupReporteAnioSelector();
-            document.getElementById('reporteMes')?.addEventListener('change', actualizarVistaPreviaReporte);
-            document.getElementById('reporteAnio')?.addEventListener('change', actualizarVistaPreviaReporte);
-            document.getElementById('btnGenerarReportePDF')?.addEventListener('click', () => actualizarVistaPreviaReporte());
-            document.getElementById('btnDescargarPDF')?.addEventListener('click', async () => { const btn = document.getElementById('btnDescargarPDF'); const orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = '⏳ Generando...'; await generarPDFReporteMensual(); btn.disabled = false; btn.innerHTML = orig; });
-            actualizarVistaPreviaReporte();
         }
 
         // IMPORT/EXPORT
@@ -1314,10 +1241,10 @@
                 if(item.placa) imported.push(item);
             }
             for(const it of imported) { const fbId = await saveToFirebase(type, it); if(fbId) it.firebaseId = fbId; }
-            if(type === 'vehicles') { vehicles = vehicles.concat(imported); localStorage.setItem('vehicles', JSON.stringify(vehicles)); loadVehicleData(); updatePlacasList(); cargarAnalisisCombustibleCompleto(); }
+            if(type === 'vehicles') { vehicles = vehicles.concat(imported); localStorage.setItem('vehicles', JSON.stringify(vehicles)); loadVehicleData(); updatePlacasList(); cargarAnalisisCombustible(); }
             else if(type === 'maintenances') { maintenances = maintenances.concat(imported); localStorage.setItem('maintenances', JSON.stringify(maintenances)); loadMaintenanceData(); }
             else if(type === 'inspections') { inspections = inspections.concat(imported); localStorage.setItem('inspections', JSON.stringify(inspections)); loadInspectionData(); }
-            else if(type === 'fuel') { fuelRecords = fuelRecords.concat(imported); localStorage.setItem('fuelRecords', JSON.stringify(fuelRecords)); loadFuelData(); cargarAnalisisCombustibleCompleto(); }
+            else if(type === 'fuel') { fuelRecords = fuelRecords.concat(imported); localStorage.setItem('fuelRecords', JSON.stringify(fuelRecords)); loadFuelData(); cargarAnalisisCombustible(); }
             else if(type === 'siniestros') { siniestros = siniestros.concat(imported); localStorage.setItem('siniestros', JSON.stringify(siniestros)); loadSiniestroData(); }
             else if(type === 'lavados') { lavados = lavados.concat(imported); localStorage.setItem('lavados', JSON.stringify(lavados)); loadLavadoData(); }
             else if(type === 'gasoil') { gasoilRecords = gasoilRecords.concat(imported); localStorage.setItem('gasoilRecords', JSON.stringify(gasoilRecords)); loadGasoilData(); }
@@ -1352,8 +1279,110 @@
             searches.forEach(({input,tbody}) => { const inp = document.getElementById(input); if(inp) inp.addEventListener('input', (e) => { const term = e.target.value.toLowerCase(); const rows = document.getElementById(tbody)?.querySelectorAll('tr'); if(rows) rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(term) ? '' : 'none'; }); }); });
         }
 
+        // REPORTE MENSUAL PDF
+        function calcularEstadisticasMensuales(mes, anio) {
+            const stats = { 'U.N Los Teques': { mantenimientos: { preventivos:0, correctivos:0, total:0 }, lavados:{ cantidad:0, total:0 }, gasolina:{ litros:0, total:0 }, gasoil:{ litros:0, flete:0, total:0 } }, 'MSO': { mantenimientos: { preventivos:0, correctivos:0, total:0 }, lavados:{ cantidad:0, total:0 }, gasolina:{ litros:0, total:0 }, gasoil:{ litros:0, flete:0, total:0 } } };
+            maintenances.forEach(m => { if(stats[m.centro]) { const f = new Date(m.fecha); if(f.getMonth()+1 == mes && f.getFullYear() == anio) { stats[m.centro].mantenimientos.total += parseFloat(m.costo||0); if(m.tipo === 'preventivo') stats[m.centro].mantenimientos.preventivos++; else if(m.tipo === 'correctivo') stats[m.centro].mantenimientos.correctivos++; } } });
+            lavados.forEach(l => { if(stats[l.centro]) { const f = new Date(l.fecha); if(f.getMonth()+1 == mes && f.getFullYear() == anio) { stats[l.centro].lavados.cantidad++; stats[l.centro].lavados.total += parseFloat(l.costo||0); } } });
+            fuelRecords.forEach(f => { if(stats[f.centro]) { const fd = new Date(f.fecha); if(fd.getMonth()+1 == mes && fd.getFullYear() == anio) { stats[f.centro].gasolina.litros += parseFloat(f.litros||0); stats[f.centro].gasolina.total += parseFloat(f.costo||0); } } });
+            gasoilRecords.forEach(g => { if(stats[g.centro]) { const fd = new Date(g.fecha); if(fd.getMonth()+1 == mes && fd.getFullYear() == anio) { stats[g.centro].gasoil.litros += parseFloat(g.litros||0); stats[g.centro].gasoil.flete += parseFloat(g.flete||0); stats[g.centro].gasoil.total += parseFloat(g.costo||0); } } });
+            return stats;
+        }
+
+        function generarHTMLReporteMensual(mes, anio) {
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const stats = calcularEstadisticasMensuales(mes, anio);
+            const totalMant = stats['U.N Los Teques'].mantenimientos.total + stats['MSO'].mantenimientos.total;
+            const totalLav = stats['U.N Los Teques'].lavados.total + stats['MSO'].lavados.total;
+            const totalGas = stats['U.N Los Teques'].gasolina.total + stats['MSO'].gasolina.total;
+            const totalGasoil = stats['U.N Los Teques'].gasoil.total + stats['MSO'].gasoil.total;
+            const totalGuarenas = stats['U.N Los Teques'].mantenimientos.total + stats['U.N Los Teques'].lavados.total + stats['U.N Los Teques'].gasolina.total + stats['U.N Los Teques'].gasoil.total;
+            const totalMSO = stats['MSO'].mantenimientos.total + stats['MSO'].lavados.total + stats['MSO'].gasolina.total + stats['MSO'].gasoil.total;
+            const fecha = new Date().toLocaleString('es-ES');
+            return `<div style="font-family:Arial;max-width:1200px;margin:0 auto;background:white;padding:30px">
+                <h1 style="color:#005BAA;text-align:center;border-bottom:3px solid #005BAA;padding-bottom:15px">RELACIÓN DE GASTOS FLOTA - ${meses[mes-1].toUpperCase()} ${anio}</h1>
+                <table style="width:100%;border-collapse:collapse;border:2px solid #000;margin-bottom:40px"><thead><tr style="background:#e5e7eb"><th style="border:1px solid #000;padding:12px">CENTRO</th><th style="border:1px solid #000;padding:12px">MANTENIMIENTOS</th><th style="border:1px solid #000;padding:12px">LAVADO</th><th style="border:1px solid #000;padding:12px">GASOLINA</th><th style="border:1px solid #000;padding:12px">GASOIL</th> </thead>
+                <tbody>
+                    <tr><td style="border:1px solid #000;padding:10px;font-weight:bold">U.N Los Teques</td>
+                        <td style="border:1px solid #000;padding:10px">Preventivos: ${stats['U.N Los Teques'].mantenimientos.preventivos}<br>Correctivos: ${stats['U.N Los Teques'].mantenimientos.correctivos}<br><strong>TOTAL: $${stats['U.N Los Teques'].mantenimientos.total.toFixed(2)}</strong></td>
+                        <td style="border:1px solid #000;padding:10px">Vehículos: ${stats['U.N Los Teques'].lavados.cantidad}<br><strong>TOTAL: $${stats['U.N Los Teques'].lavados.total.toFixed(2)}</strong></td>
+                        <td style="border:1px solid #000;padding:10px">Litros: ${stats['U.N Los Teques'].gasolina.litros.toFixed(2)} L<br><strong>TOTAL: $${stats['U.N Los Teques'].gasolina.total.toFixed(2)}</strong></td>
+                        <td style="border:1px solid #000;padding:10px">Litros: ${stats['U.N Los Teques'].gasoil.litros.toFixed(2)} L<br>Flete: $${stats['U.N Los Teques'].gasoil.flete.toFixed(2)}<br><strong>TOTAL: $${stats['U.N Los Teques'].gasoil.total.toFixed(2)}</strong></td>
+                    </tr>
+                    <tr><td style="border:1px solid #000;padding:10px;font-weight:bold">MSO</td>
+                        <td style="border:1px solid #000;padding:10px">Preventivos: ${stats['MSO'].mantenimientos.preventivos}<br>Correctivos: ${stats['MSO'].mantenimientos.correctivos}<br><strong>TOTAL: $${stats['MSO'].mantenimientos.total.toFixed(2)}</strong></td>
+                        <td style="border:1px solid #000;padding:10px">Vehículos: ${stats['MSO'].lavados.cantidad}<br><strong>TOTAL: $${stats['MSO'].lavados.total.toFixed(2)}</strong></td>
+                        <td style="border:1px solid #000;padding:10px">Litros: ${stats['MSO'].gasolina.litros.toFixed(2)} L<br><strong>TOTAL: $${stats['MSO'].gasolina.total.toFixed(2)}</strong></td>
+                        <td style="border:1px solid #000;padding:10px">Litros: ${stats['MSO'].gasoil.litros.toFixed(2)} L<br>Flete: $${stats['MSO'].gasoil.flete.toFixed(2)}<br><strong>TOTAL: $${stats['MSO'].gasoil.total.toFixed(2)}</strong></td>
+                    </tr>
+                    <tr style="background:#e5e7eb;font-weight:bold"><td style="border:1px solid #000;padding:10px;text-align:right">TOTALES</td><td style="border:1px solid #000;padding:10px">$${totalMant.toFixed(2)}</td><td style="border:1px solid #000;padding:10px">$${totalLav.toFixed(2)}</td><td style="border:1px solid #000;padding:10px">$${totalGas.toFixed(2)}</td><td style="border:1px solid #000;padding:10px">$${totalGasoil.toFixed(2)}</td></tr>
+                </tbody>
+                </table>
+                <div><h2 style="color:#005BAA">RESUMEN POR CENTRO</h2><table style="width:70%;border-collapse:collapse;border:2px solid #000;margin:0 auto"><tr style="background:#e5e7eb"><th style="border:1px solid #000;padding:12px">CENTRO</th><th style="border:1px solid #000;padding:12px">TOTAL</th> </tr>
+                <tr><td style="border:1px solid #000;padding:10px;font-weight:bold">U.N Los Teques</td><td style="border:1px solid #000;padding:10px;text-align:right;color:#005BAA">$${totalGuarenas.toFixed(2)}</td></tr>
+                <tr><td style="border:1px solid #000;padding:10px;font-weight:bold">MSO</td><td style="border:1px solid #000;padding:10px;text-align:right;color:#005BAA">$${totalMSO.toFixed(2)}</td></tr>
+                <tr style="background:#f0f0f0;font-weight:bold"><td style="border:1px solid #000;padding:10px">TOTAL GENERAL</td><td style="border:1px solid #000;padding:10px;text-align:right;color:#005BAA">$${(totalGuarenas+totalMSO).toFixed(2)}</td></tr>
+                </table></div>
+                <div style="margin-top:50px;text-align:right;font-size:11px;color:#666;border-top:1px solid #ccc;padding-top:20px"><p>📅 Generado: ${fecha}</p><p>Sistema de Gestión de Flota U.N Los Teques</p></div>
+            </div>`;
+        }
+
+        function actualizarVistaPreviaReporte() {
+            if(!currentUser || currentUser.role !== 'admin') return;
+            const mes = document.getElementById('reporteMes')?.value || new Date().getMonth()+1;
+            const anio = document.getElementById('reporteAnio')?.value || new Date().getFullYear();
+            const contenedor = document.getElementById('contenidoReporteMensual');
+            if(contenedor) contenedor.innerHTML = generarHTMLReporteMensual(parseInt(mes), parseInt(anio));
+        }
+
+        async function generarPDFReporteMensual() {
+            const mes = document.getElementById('reporteMes')?.value || '1';
+            const anio = document.getElementById('reporteAnio')?.value || new Date().getFullYear();
+            const meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const temp = document.createElement('div');
+            temp.style.position = 'absolute'; temp.style.left = '-9999px'; temp.style.width = '1200px'; temp.style.background = 'white'; temp.style.padding = '40px';
+            temp.innerHTML = generarHTMLReporteMensual(parseInt(mes), parseInt(anio));
+            document.body.appendChild(temp);
+            try {
+                const canvas = await html2canvas(temp, { scale: 1.2, backgroundColor: '#ffffff' });
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: 'a4' });
+                const imgData = canvas.toDataURL('image/png');
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const imgWidth = pageWidth - 30;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                doc.addImage(imgData, 'PNG', (pageWidth - imgWidth)/2, 15, imgWidth, imgHeight);
+                doc.save(`Gastos_Flota_${meses[parseInt(mes)-1]}_${anio}.pdf`);
+                alert('✅ PDF generado correctamente');
+            } catch(e) { 
+                console.error(e);
+                alert('❌ Error al generar PDF'); 
+            }
+            finally { document.body.removeChild(temp); }
+        }
+
+        function setupReporteMensualPDFListeners() {
+            if(!currentUser || currentUser.role !== 'admin') return;
+            setupReporteAnioSelector();
+            document.getElementById('reporteMes')?.addEventListener('change', actualizarVistaPreviaReporte);
+            document.getElementById('reporteAnio')?.addEventListener('change', actualizarVistaPreviaReporte);
+            document.getElementById('btnGenerarReportePDF')?.addEventListener('click', () => actualizarVistaPreviaReporte());
+            document.getElementById('btnDescargarPDF')?.addEventListener('click', async () => { 
+                const btn = document.getElementById('btnDescargarPDF'); 
+                const orig = btn.innerHTML; 
+                btn.disabled = true; 
+                btn.innerHTML = '⏳ Generando...'; 
+                await generarPDFReporteMensual(); 
+                btn.disabled = false; 
+                btn.innerHTML = orig; 
+            });
+            actualizarVistaPreviaReporte();
+        }
+
         function initializeTabs() { 
-            document.querySelectorAll('.tab-link').forEach(link => { link.addEventListener('click', () => switchTab(link.getAttribute('data-tab-id'))); }); 
+            document.querySelectorAll('.tab-link').forEach(link => { 
+                link.addEventListener('click', () => switchTab(link.getAttribute('data-tab-id'))); 
+            }); 
         }
         
         function switchTab(tabId) { 
@@ -1372,7 +1401,7 @@
                 setupReporteAnioSelector(); 
                 actualizarVistaPreviaReporte(); 
             } else if(tabId === 'analisis-combustible' && currentUser?.role === 'admin') { 
-                cargarAnalisisCombustibleCompleto(); 
+                cargarAnalisisCombustible(); 
             }
         }
         
@@ -1386,145 +1415,12 @@
             loadGasoilData(); 
         }
 
-        function setupAllForms() { 
-            setupVehicleForm(); 
-            setupMaintenanceForm(); 
-            setupInspectionForm(); 
-            setupFuelForm(); 
-            setupSiniestroForm(); 
-            setupLavadoForm(); 
-            setupGasoilForm(); 
-        }
-
+        // Eventos de filtros de reportes
         document.getElementById('applyFilters')?.addEventListener('click', () => updateReports());
         document.getElementById('mostrarSoloPendientesReporte')?.addEventListener('click', () => {
             mostrarSoloPendientesReporte = !mostrarSoloPendientesReporte;
             updateReports();
         });
-
-        function cargarDatosEjemplo() {
-            if (vehicles.length === 0) {
-                vehicles = [
-                    { placa: "ABC123", marca: "Toyota", modelo: "Corolla", anio: "2020", tipoVehiculo: "sedan", centroOperaciones: "U.N Los Teques", capacidadTanque: "50", kilometrajeActual: 15000, departamentoAsignado: "Logística", estado: "Operativo" },
-                    { placa: "XYZ789", marca: "Ford", modelo: "F-150", anio: "2019", tipoVehiculo: "camion_liviano", centroOperaciones: "MSO", capacidadTanque: "80", kilometrajeActual: 45000, departamentoAsignado: "Transporte", estado: "Operativo" }
-                ];
-                localStorage.setItem('vehicles', JSON.stringify(vehicles));
-                loadVehicleData();
-                updatePlacasList();
-                console.log('📦 Datos de ejemplo cargados');
-            }
-        }
-
-        function init() {
-            console.log('🚀 Iniciando Gestión de Flota U.N Los Teques');
-            
-            const horaInput = document.getElementById('horaInspeccion');
-            if (horaInput && !horaInput.value) {
-                horaInput.value = getHoraVenezuela();
-            }
-            
-            document.getElementById('loginButton').addEventListener('click', handleLogin);
-            document.getElementById('loginPassword').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
-            document.getElementById('logoutButton').addEventListener('click', logout);
-            
-            initializeTabs();
-            checkAuth();
-        }
-
-        function checkAuth() {
-            const savedUser = localStorage.getItem('fleetCurrentUser');
-            if (savedUser) { 
-                currentUser = JSON.parse(savedUser); 
-                showApp(); 
-            } else { 
-                showLogin(); 
-            }
-        }
-
-        function showLogin() { 
-            document.getElementById('loginContainer').style.display = 'flex'; 
-            document.getElementById('appContainer').style.display = 'none'; 
-        }
-        
-        function showApp() {
-            document.getElementById('loginContainer').style.display = 'none';
-            document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('userRole').textContent = currentUser.role === 'admin' ? '👑 Administrador' : '👤 Chofer';
-            
-            loadLocalData();
-            cargarDatosEjemplo();
-            configureTabsForRole();
-            loadAllData();
-            setupAllForms();
-            setupSearchFunctionality();
-            setupYearSelector();
-            setupReporteAnioSelector();
-            updateReports();
-            updateTotalPendienteHeader();
-            actualizarVistaPreviaReporte();
-            cargarAnalisisCombustibleCompleto();
-            
-            if (currentUser.role === 'admin' && firebaseInicializado && db) {
-                document.getElementById('syncButton').style.display = 'inline-block';
-                document.getElementById('syncButton').addEventListener('click', syncAllWithFirebase);
-            } else { 
-                document.getElementById('syncButton').style.display = 'none'; 
-            }
-            
-            if (currentUser.role === 'admin') {
-                setupExportButtons();
-                setupImportButtons();
-                setupReporteMensualPDFListeners();
-            }
-        }
-
-        function configureTabsForRole() {
-            const tabs = document.querySelectorAll('.tab-link');
-            if (currentUser.role === 'chofer') {
-                tabs.forEach(tab => { 
-                    if(tab.getAttribute('data-tab-id') !== 'inspeccion') tab.style.display = 'none'; 
-                    else tab.style.display = 'inline-block'; 
-                });
-                document.querySelectorAll('[id*="import"], [id*="export"], #deleteMassiveBtn, #togglePendientesMantenimiento, #togglePendientesCombustible, #togglePendientesLavado, #togglePendientesGasoil, #applyFilters, #mostrarSoloPendientesReporte').forEach(btn => { if(btn) btn.style.display = 'none'; });
-                setTimeout(() => { 
-                    const tab = document.querySelector('[data-tab-id="inspeccion"]'); 
-                    if(tab) tab.click(); 
-                }, 100);
-            } else {
-                tabs.forEach(tab => tab.style.display = 'inline-block');
-            }
-        }
-
-        function loadLocalData() {
-            vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
-            maintenances = JSON.parse(localStorage.getItem('maintenances')) || [];
-            inspections = JSON.parse(localStorage.getItem('inspections')) || [];
-            fuelRecords = JSON.parse(localStorage.getItem('fuelRecords')) || [];
-            siniestros = JSON.parse(localStorage.getItem('siniestros')) || [];
-            lavados = JSON.parse(localStorage.getItem('lavados')) || [];
-            gasoilRecords = JSON.parse(localStorage.getItem('gasoilRecords')) || [];
-            console.log(`📊 Datos cargados: ${vehicles.length} vehículos, ${inspections.length} inspecciones, ${fuelRecords.length} cargas`);
-        }
-
-        function handleLogin() {
-            const profile = document.getElementById('loginProfile').value;
-            const password = document.getElementById('loginPassword').value;
-            if (USERS[profile] && USERS[profile].password === password) {
-                currentUser = { role: USERS[profile].role, name: USERS[profile].name };
-                localStorage.setItem('fleetCurrentUser', JSON.stringify(currentUser));
-                document.getElementById('loginError').classList.add('hidden');
-                showApp();
-            } else { 
-                document.getElementById('loginError').classList.remove('hidden'); 
-            }
-        }
-
-        function logout() { 
-            localStorage.removeItem('fleetCurrentUser'); 
-            currentUser = null; 
-            showLogin(); 
-            document.getElementById('loginPassword').value = ''; 
-        }
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
